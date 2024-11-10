@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">Kotlin_for_Android_HW_1</string>
+    <string name="app_name" translatable="false">Kotlin_for_Android_HW_1</string>
+    <string name="nmedia">NMedia!</string>
 </resources>
