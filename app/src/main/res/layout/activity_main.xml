@@ -108,13 +108,16 @@
         android:id="@+id/imageButtonView1"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
+        android:layout_margin="16dp"
         android:background="?selectableItemBackground"
         android:contentDescription="@string/like_button_descr"
         android:drawableLeft="@drawable/outline_visibility_24"
         android:text="5"
         android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
-        tools:layout_editor_absoluteY="265dp" />
+        app:layout_constraintTop_toBottomOf="@id/barrier2"
+        />
+
 
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/barrier3"
