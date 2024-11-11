@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name" translatable="false">Kotlin_for_Android_HW_1</string>
     <string name="nmedia">NMedia!</string>
+    <string name="avatarContentDescription" translatable="false">avatar</string>
+    <string name="menu_button_more_vert" translatable="false">Menu</string>
+    <string name="like_button_descr" translatable="false">Like Button</string>
 </resources>
