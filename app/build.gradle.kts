@@ -8,7 +8,7 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "ru.netology.kotlin_for_android_hw_1"
+        applicationId = "ru.netology.nmedia"
         minSdk = 23
         targetSdk = 34
         versionCode = 1
