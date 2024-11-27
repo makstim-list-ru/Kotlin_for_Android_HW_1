@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
@@ -7,14 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-   <LinearLayout
-       android:id="@+id/container"
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:orientation="vertical"
-      />
-
-   <!-- <ImageView
+    <ImageView
         android:id="@+id/imageView1"
         android:layout_width="48dp"
         android:layout_height="48dp"
@@ -140,6 +133,6 @@
         android:layout_height="1dp"
         android:background="@android:color/holo_red_dark"
         app:layout_constraintTop_toBottomOf="@id/barrier3" />
--->
 
-</ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

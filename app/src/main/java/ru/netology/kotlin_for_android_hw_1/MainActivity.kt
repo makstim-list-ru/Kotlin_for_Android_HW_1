@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import ru.netology.kotlin_for_android_hw_1.databinding.ActivityMainBinding
+import ru.netology.kotlin_for_android_hw_1.databinding.PostCardBinding
 import ru.netology.kotlin_for_android_hw_1.dto.Post
 import ru.netology.kotlin_for_android_hw_1.viewmodel.PostViewModel
 import kotlin.math.ln
@@ -25,27 +26,28 @@ class MainActivity : AppCompatActivity() {
 //            content = "Привет, это новая Нетология! Когда-то Нетология начиналась с интенсивов по онлайн-маркетингу. Затем появились курсы по дизайну, разработке, аналитике и управлению. Мы растём сами и помогаем расти студентам: от новичков до уверенных профессионалов. Но самое важное остаётся с нами: мы верим, что в каждом уже есть сила, которая заставляет хотеть больше, целиться выше, бежать быстрее. Наша миссия — помочь встать на путь роста и начать цепочку перемен → http://netolo.gy/fyb"
 //        )
 
-        viewModel.post.observe(this) { post->
+        viewModel.data.observe(this) { posts ->
+            binding.container.removeAllViews()
+            posts.map { post ->
+                PostCardBinding.inflate(layoutInflater, binding.container, false).apply {
+                    this.author1.text = post.author
+                    this.published1.text = post.published
+                    this.content1.text = post.content
+                    this.imageButtonHeart1.text = getFormatedNumber(post.likesNum)
+                    this.imageButtonHeart1.setCompoundDrawablesWithIntrinsicBounds(
+                        if (!post.likedByMe) {
+                            getResources().getDrawable(R.drawable.outline_favorite_border_24)
+                        } else {
+                            getResources().getDrawable(R.drawable.baseline_favorite_24)
+                        },
+                        null, null, null
+                    )
+                    this.imageButtonShare1.text = getFormatedNumber(post.sharesNum)
+                    this.imageButtonView1.text = getFormatedNumber(post.seenNum)
 
 
-            binding.author1.text = post.author
-            binding.published1.text = post.published
-            binding.content1.text = post.content
-            binding.imageButtonHeart1.text = getFormatedNumber(post.likesNum)
-            binding.imageButtonHeart1.setCompoundDrawablesWithIntrinsicBounds(
-                if (!post.likedByMe) {
-                    getResources().getDrawable(R.drawable.outline_favorite_border_24)
-                } else {
-                    getResources().getDrawable(R.drawable.baseline_favorite_24)
-                },
-                null, null, null
-            )
-            binding.imageButtonShare1.text = getFormatedNumber(post.sharesNum)
-            binding.imageButtonView1.text = getFormatedNumber(post.seenNum)
-
-
-            binding.imageButtonHeart1.setOnClickListener {
-                viewModel.likeVM()
+                    this.imageButtonHeart1.setOnClickListener {
+                        viewModel.likeVM(post.id)
 //                if (post.likedByMe) post.likesNum-- else post.likesNum++
 //                binding.imageButtonHeart1.text = getFormatedNumber(post.likesNum)
 //
@@ -58,17 +60,19 @@ class MainActivity : AppCompatActivity() {
 //                    },
 //                    null, null, null
 //                )
-            }
+                    }
 
-            binding.imageButtonShare1.setOnClickListener {
-                viewModel.shareVM()
-                // post.sharesNum++
-                //binding.imageButtonShare1.text = getFormatedNumber(post.sharesNum)
-            }
+                    this.imageButtonShare1.setOnClickListener {
+                        viewModel.shareVM(post.id)
+                        // post.sharesNum++
+                        //binding.imageButtonShare1.text = getFormatedNumber(post.sharesNum)
+                    }
 
-            binding.root.setOnClickListener {
-                println("binding.root.setOnClickListener_ON")
-            }
+//                    this.root.setOnClickListener {
+//                        println("binding.root.setOnClickListener_ON")
+//                    }
+                }.root
+            }.forEach { binding.container.addView(it) }
         }
 
 
