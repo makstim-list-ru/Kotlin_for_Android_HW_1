@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     tools:context=".MainActivity">
 
     <ImageView
@@ -15,7 +15,9 @@
         android:contentDescription="@string/avatarContentDescription"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@sample/posts.json/data/authorAvatar" />
+        android:src="@drawable/post_avatar_drawable"/>
+        <!--tools:src="@sample/posts.json/data/authorAvatar" -->
+
 
     <TextView
         android:id="@+id/author1"

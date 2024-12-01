@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
@@ -7,139 +7,12 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-   <LinearLayout
+   <androidx.recyclerview.widget.RecyclerView
        android:id="@+id/container"
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
-       android:orientation="vertical"
+       app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+       tools:listitem="@layout/post_card"
       />
 
-   <!-- <ImageView
-        android:id="@+id/imageView1"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_margin="16dp"
-        android:contentDescription="@string/avatarContentDescription"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:src="@sample/posts.json/data/authorAvatar" />
-
-    <TextView
-        android:id="@+id/author1"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:ellipsize="end"
-        android:maxLines="1"
-        app:layout_constraintBottom_toTopOf="@id/published1"
-        app:layout_constraintEnd_toStartOf="@id/iButton1"
-        app:layout_constraintStart_toEndOf="@id/imageView1"
-        app:layout_constraintTop_toTopOf="@id/imageView1"
-        tools:text="@sample/posts.json/data/author" />
-
-    <TextView
-        android:id="@+id/published1"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:ellipsize="end"
-        android:maxLines="1"
-        app:layout_constraintBottom_toBottomOf="@id/imageView1"
-        app:layout_constraintEnd_toStartOf="@id/iButton1"
-        app:layout_constraintStart_toEndOf="@id/imageView1"
-        app:layout_constraintTop_toBottomOf="@id/author1"
-        tools:text="@sample/posts.json/data/published" />
-
-    <ImageButton
-        android:id="@+id/iButton1"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:background="?selectableItemBackground"
-        android:contentDescription="@string/menu_button_more_vert"
-        android:src="@drawable/baseline_more_vert_24"
-        app:layout_constraintBottom_toBottomOf="@id/imageView1"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/imageView1"
-        app:tint="?colorControlNormal" />
-
-    <androidx.constraintlayout.widget.Barrier
-        android:id="@+id/barrier1"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:barrierDirection="bottom"
-        app:constraint_referenced_ids="imageView1,published1,iButton1" />
-
-    <TextView
-        android:id="@+id/content1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:autoLink="all"
-        app:layout_constraintTop_toBottomOf="@id/barrier1"
-        tools:text="@sample/posts.json/data/content" />
-
-    <androidx.constraintlayout.widget.Barrier
-        android:id="@+id/barrier2"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:barrierDirection="bottom"
-        app:constraint_referenced_ids="content1" />
-
-    <Button
-        android:id="@+id/imageButtonHeart1"
-        android:layout_width="wrap_content"
-        android:layout_height="48dp"
-        android:layout_margin="16dp"
-        android:background="?selectableItemBackground"
-        android:contentDescription="@string/like_button_descr"
-        android:drawableLeft="@drawable/outline_favorite_border_24"
-        android:text="5"
-        android:textColor="@color/black"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/barrier2" />
-
-    <Button
-        android:id="@+id/imageButtonShare1"
-        android:layout_width="wrap_content"
-        android:layout_height="48dp"
-        android:layout_margin="16dp"
-        android:background="?selectableItemBackground"
-        android:contentDescription="@string/like_button_descr"
-        android:drawableLeft="@drawable/baseline_share_24"
-        android:text="5"
-        android:textColor="@color/black"
-        app:layout_constraintStart_toEndOf="@id/imageButtonHeart1"
-        app:layout_constraintTop_toBottomOf="@id/barrier2" />
-
-    <Button
-        android:id="@+id/imageButtonView1"
-        android:layout_width="wrap_content"
-        android:layout_height="48dp"
-        android:layout_margin="16dp"
-        android:background="?selectableItemBackground"
-        android:contentDescription="@string/like_button_descr"
-        android:drawableLeft="@drawable/outline_visibility_24"
-        android:text="5"
-        android:textColor="@color/black"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/barrier2"
-        />
-
-
-    <androidx.constraintlayout.widget.Barrier
-        android:id="@+id/barrier3"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:barrierDirection="bottom"
-        app:constraint_referenced_ids="imageButtonHeart1,imageButtonShare1,imageView1"
-
-        />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@android:color/holo_red_dark"
-        app:layout_constraintTop_toBottomOf="@id/barrier3" />
--->
-
-</ScrollView>
+</FrameLayout>
