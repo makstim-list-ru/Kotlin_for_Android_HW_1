@@ -2,6 +2,8 @@ package ru.netology.kotlin_for_android_hw_1.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import ru.netology.kotlin_for_android_hw_1.R
 import ru.netology.kotlin_for_android_hw_1.databinding.PostCardBinding
@@ -9,49 +11,56 @@ import ru.netology.kotlin_for_android_hw_1.dto.Post
 import kotlin.math.ln
 import kotlin.math.pow
 
-class PostsAdapter(val callback: (Post, String) -> Unit) : RecyclerView.Adapter<PostViewHolder>() {
-
-    var list = emptyList<Post>()
-        set(value) {
-            field = value
-            notifyDataSetChanged()
-        }
-
+class PostsAdapter(private val callback: (Post, String) -> Unit) :
+    ListAdapter<Post, PostViewHolder>(PostDiffUtil) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
         val binding = PostCardBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return PostViewHolder(binding)
-    }
-
-    override fun getItemCount(): Int {
-        return list.size
+        return PostViewHolder(binding, callback)
     }
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
-        val post = list[position]
-        with(holder.getBinding()) {
-            this.author1.text = post.author
-            this.published1.text = post.published
-            this.content1.text = post.content
-            this.imageButtonHeart1.text = getFormatedNumber(post.likesNum)
-            this.imageButtonHeart1.setCompoundDrawablesWithIntrinsicBounds(
+
+        val post = getItem(position)
+        holder.onBindPost(holder.getBinding(), post)
+    }
+}
+
+object PostDiffUtil : DiffUtil.ItemCallback<Post>() {
+    override fun areItemsTheSame(oldItem: Post, newItem: Post): Boolean {
+        return oldItem.id == newItem.id
+    }
+
+    override fun areContentsTheSame(oldItem: Post, newItem: Post): Boolean {
+        return oldItem == newItem
+    }
+}
+
+class PostViewHolder(private val binding: PostCardBinding, private val callback: (Post, String) -> Unit) : RecyclerView.ViewHolder(binding.root) {
+    fun getBinding() = binding
+    fun onBindPost(binding: PostCardBinding, post: Post) {
+        with(binding) {
+            author1.text = post.author
+            published1.text = post.published
+            content1.text = post.content
+            imageButtonHeart1.text = getFormatedNumber(post.likesNum)
+            imageButtonHeart1.setCompoundDrawablesWithIntrinsicBounds(
                 if (!post.likedByMe) {
-                    holder.getBinding().root.context.getResources()
-                        .getDrawable(R.drawable.outline_favorite_border_24)
+                    binding.root.context.getResources()
+                        .getDrawable(ru.netology.kotlin_for_android_hw_1.R.drawable.outline_favorite_border_24)
                 } else {
-                    holder.getBinding().root.context.getResources()
-                        .getDrawable(R.drawable.baseline_favorite_24)
+                    binding.root.context.getResources()
+                        .getDrawable(ru.netology.kotlin_for_android_hw_1.R.drawable.baseline_favorite_24)
                 }, null, null, null
             )
-            this.imageButtonShare1.text = getFormatedNumber(post.sharesNum)
-            this.imageButtonView1.text = getFormatedNumber(post.seenNum)
+            imageButtonShare1.text = getFormatedNumber(post.sharesNum)
+            imageButtonView1.text = getFormatedNumber(post.seenNum)
 
-
-            this.imageButtonHeart1.setOnClickListener {
+            imageButtonHeart1.setOnClickListener {
                 callback(post, "like")
                 //viewModel.likeVM(post.id)
             }
 
-            this.imageButtonShare1.setOnClickListener {
+            imageButtonShare1.setOnClickListener {
                 callback(post, "share")
                 //viewModel.shareVM(post.id)
             }
@@ -73,6 +82,5 @@ class PostsAdapter(val callback: (Post, String) -> Unit) : RecyclerView.Adapter<
     }
 }
 
-class PostViewHolder(private val binding: PostCardBinding) : RecyclerView.ViewHolder(binding.root) {
-    fun getBinding() = binding
-}
+
+
