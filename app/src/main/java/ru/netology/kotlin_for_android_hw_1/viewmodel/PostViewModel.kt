@@ -38,4 +38,8 @@ class PostViewModel : ViewModel() {
     fun editVM(post: Post) {
         editedPostLD.value = post
     }
+
+    fun cancelVM() {
+        editedPostLD.value = postEmpty
+    }
 }

@@ -7,44 +7,105 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-   <androidx.recyclerview.widget.RecyclerView
-       android:id="@+id/container"
-       android:layout_width="match_parent"
-       android:layout_height="0dp"
-       android:layout_marginBottom="16dp"
-       app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-       app:layout_constraintBottom_toTopOf="@id/barrier"
-       app:layout_constraintTop_toTopOf="parent"
-       tools:layout_editor_absoluteX="0dp"
-       tools:listitem="@layout/post_card" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginBottom="16dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toTopOf="@id/barrier"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        tools:layout_editor_absoluteX="-16dp"
+        tools:listitem="@layout/post_card" />
 
-   <EditText
-       android:id="@+id/content"
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:hint="Save"
-       android:inputType="textMultiLine"
-       android:padding="8dp"
-       app:layout_constraintBottom_toBottomOf="parent" />
+    <EditText
+        android:id="@+id/content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Save"
+        android:inputType="textMultiLine"
+        android:padding="8dp"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
-   <ImageButton
-       android:id="@+id/saveButton"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:background="@android:color/transparent"
-       android:src="@drawable/round_check_circle_outline_24"
-       app:layout_constraintBottom_toBottomOf="parent"
-       app:layout_constraintEnd_toEndOf="parent"
-       app:tint="?colorControlNormal"
-       android:contentDescription="Save button"/>
+    <ImageButton
+        android:id="@+id/saveButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:contentDescription="Save button"
+        android:src="@drawable/round_check_circle_outline_24"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:tint="?colorControlNormal" />
 
-   <androidx.constraintlayout.widget.Barrier
-       android:id="@+id/barrier"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       app:barrierDirection="top"
-       app:constraint_referenced_ids="saveButton,content" />
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/barrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="top"
+        app:constraint_referenced_ids="saveButton,content" />
 
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/barrier2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="top"
+        app:constraint_referenced_ids="preview1,pencil,cancelEdit" />
 
+    <ImageView
+        android:id="@+id/pencil"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="?android:colorBackground"
+        android:contentDescription="pencil icon"
+        android:padding="8dp"
+        android:src="@drawable/baseline_edit_24"
+        app:layout_constraintBottom_toBottomOf="@id/barrier"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/preview1"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="?android:colorBackground"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:padding="4dp"
+        app:layout_constraintBottom_toTopOf="@id/preview2"
+        app:layout_constraintEnd_toStartOf="@id/cancelEdit"
+        app:layout_constraintStart_toEndOf="@id/pencil"
+        app:layout_constraintTop_toTopOf="@id/barrier2" />
+
+    <TextView
+        android:id="@+id/preview2"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="?android:colorBackground"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:padding="4dp"
+        app:layout_constraintBottom_toBottomOf="@id/barrier"
+        app:layout_constraintEnd_toStartOf="@id/cancelEdit"
+        app:layout_constraintStart_toEndOf="@id/pencil"
+        app:layout_constraintTop_toBottomOf="@id/preview1" />
+
+    <ImageButton
+        android:id="@+id/cancelEdit"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="?android:colorBackground"
+        android:contentDescription="cancel button"
+        android:padding="8dp"
+        android:src="@drawable/outline_cancel_24"
+        app:layout_constraintBottom_toBottomOf="@id/barrier"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/group1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        app:constraint_referenced_ids="barrier2, pencil, preview1, preview2, cancelEdit" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
