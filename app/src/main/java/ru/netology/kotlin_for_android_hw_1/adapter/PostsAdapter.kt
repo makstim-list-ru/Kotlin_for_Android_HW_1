@@ -2,6 +2,7 @@ package ru.netology.kotlin_for_android_hw_1.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -21,7 +22,7 @@ class PostsAdapter(private val callback: (Post, String) -> Unit) :
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
 
         val post = getItem(position)
-        holder.onBindPost(holder.getBinding(), post)
+        holder.onBindPost(post)
     }
 }
 
@@ -35,9 +36,9 @@ object PostDiffUtil : DiffUtil.ItemCallback<Post>() {
     }
 }
 
-class PostViewHolder(private val binding: PostCardBinding, private val callback: (Post, String) -> Unit) : RecyclerView.ViewHolder(binding.root) {
-    fun getBinding() = binding
-    fun onBindPost(binding: PostCardBinding, post: Post) {
+class PostViewHolder(val binding: PostCardBinding, private val callback: (Post, String) -> Unit) :
+    RecyclerView.ViewHolder(binding.root) {
+    fun onBindPost(post: Post) {
         with(binding) {
             author1.text = post.author
             published1.text = post.published
@@ -45,11 +46,11 @@ class PostViewHolder(private val binding: PostCardBinding, private val callback:
             imageButtonHeart1.text = getFormatedNumber(post.likesNum)
             imageButtonHeart1.setCompoundDrawablesWithIntrinsicBounds(
                 if (!post.likedByMe) {
-                    binding.root.context.getResources()
-                        .getDrawable(ru.netology.kotlin_for_android_hw_1.R.drawable.outline_favorite_border_24)
+                    root.context.getResources()
+                        .getDrawable(R.drawable.outline_favorite_border_24)
                 } else {
-                    binding.root.context.getResources()
-                        .getDrawable(ru.netology.kotlin_for_android_hw_1.R.drawable.baseline_favorite_24)
+                    root.context.getResources()
+                        .getDrawable(R.drawable.baseline_favorite_24)
                 }, null, null, null
             )
             imageButtonShare1.text = getFormatedNumber(post.sharesNum)
@@ -63,6 +64,25 @@ class PostViewHolder(private val binding: PostCardBinding, private val callback:
             imageButtonShare1.setOnClickListener {
                 callback(post, "share")
                 //viewModel.shareVM(post.id)
+            }
+
+            iButton1.setOnClickListener { view ->
+                val pum = PopupMenu(view.context, view)
+                pum.inflate(R.menu.menu_options)
+                pum.setOnMenuItemClickListener {
+                    when (it.itemId) {
+                        R.id.remove -> {
+                            callback(post, "remove")
+                            true
+                        }
+                        R.id.edit -> {
+                            callback(post, "edit")
+                            true
+                        }
+                        else -> false
+                    }
+                }
+                pum.show()
             }
         }
     }

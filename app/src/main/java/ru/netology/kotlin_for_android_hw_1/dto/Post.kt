@@ -12,3 +12,17 @@ data class Post(
     val seenNum: Long = 9_999
 
 )
+
+val postEmpty = Post(
+    id = 0,
+    author = "",
+    authorAvatar = "",
+    published = "",
+    content = "",
+    likedByMe = false,
+    likesNum = 0,
+    sharesNum = 0,
+    seenNum = 0
+)
+
+

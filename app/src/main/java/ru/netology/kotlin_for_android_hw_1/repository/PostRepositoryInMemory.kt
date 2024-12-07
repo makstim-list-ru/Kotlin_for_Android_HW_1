@@ -5,9 +5,10 @@ import androidx.lifecycle.MutableLiveData
 import ru.netology.kotlin_for_android_hw_1.dto.Post
 
 class PostRepositoryInMemory : PostRepository {
+    private var nextPostID = 1L
     private var posts = listOf<Post>(
         Post(
-            id = 1,
+            id = nextPostID++,
             author = "Нетология. Университет интернет-профессий будущего",
             published = "21 мая в 18:36",
             content = "Много лет размышлял я над жизнью земной.\n" +
@@ -16,7 +17,7 @@ class PostRepositoryInMemory : PostRepository {
                     "Вот последняя правда, открытая мной. → https://library.vladimir.ru/spravochnyj-material/omar2.html"
         ),
         Post(
-            id = 2,
+            id = nextPostID++,
             author = "Нетология. Университет интернет-профессий будущего",
             published = "21 мая в 18:36",
             content = "Я — школяр в этом лучшем из лучших миров.\n" +
@@ -25,7 +26,7 @@ class PostRepositoryInMemory : PostRepository {
                     "Все еще не зачислен в разряд мастеров… → https://library.vladimir.ru/spravochnyj-material/omar2.html"
         ),
         Post(
-            id = 3,
+            id = nextPostID++,
             author = "Нетология. Университет интернет-профессий будущего",
             published = "21 мая в 18:36",
             content = "Лучше впасть в нищету, голодать или красть,\n" +
@@ -34,7 +35,7 @@ class PostRepositoryInMemory : PostRepository {
                     "За столом у мерзавцев, имеющих власть. → https://library.vladimir.ru/spravochnyj-material/omar2.html"
         ),
         Post(
-            id = 4,
+            id = nextPostID++,
             author = "Нетология. Университет интернет-профессий будущего",
             published = "21 мая в 18:36",
             content = "Не оплакивай, смертный, вчерашних потерь,\n" +
@@ -43,7 +44,7 @@ class PostRepositoryInMemory : PostRepository {
                     "Верь минуте текущей — будь счастлив теперь! → https://library.vladimir.ru/spravochnyj-material/omar2.html"
         ),
         Post(
-            id = 5,
+            id = nextPostID++,
             author = "Нетология. Университет интернет-профессий будущего",
             published = "21 мая в 18:36",
             content = "Если все государства, вблизи и вдали,\n" +
@@ -52,7 +53,7 @@ class PostRepositoryInMemory : PostRepository {
                     "Твой удел невелик: три аршина земли. → https://library.vladimir.ru/spravochnyj-material/omar2.html"
         ),
         Post(
-            id = 6,
+            id = nextPostID++,
             author = "Нетология. Университет интернет-профессий будущего",
             published = "21 мая в 18:36",
             content = "Привет, это новая Нетология! Когда-то Нетология начиналась с интенсивов по онлайн-маркетингу. Затем появились курсы по дизайну, разработке, аналитике и управлению. Мы растём сами и помогаем расти студентам: от новичков до уверенных профессионалов. Но самое важное остаётся с нами: мы верим, что в каждом уже есть сила, которая заставляет хотеть больше, целиться выше, бежать быстрее. Наша миссия — помочь встать на путь роста и начать цепочку перемен → http://netolo.gy/fyb"
@@ -81,6 +82,23 @@ class PostRepositoryInMemory : PostRepository {
             if (it.id != id) it else it.copy(
                 sharesNum = it.sharesNum + 1
             )
+        }
+        data.value = posts
+    }
+
+    override fun removeByID(id: Long) {
+        posts = posts.filter { it.id != id }
+        data.value = posts
+    }
+
+    override fun save(post: Post) {
+        posts=posts.plus(post.copy(id = nextPostID++, author = "Me", published = "Now"))
+        data.value = posts
+    }
+
+    override fun edit(post: Post) {
+        posts = posts.map {
+            if (it.id != post.id) it else it.copy(content = post.content)
         }
         data.value = posts
     }
