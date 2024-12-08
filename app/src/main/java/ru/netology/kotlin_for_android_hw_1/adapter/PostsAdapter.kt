@@ -44,15 +44,16 @@ class PostViewHolder(val binding: PostCardBinding, private val callback: (Post, 
             published1.text = post.published
             content1.text = post.content
             imageButtonHeart1.text = getFormatedNumber(post.likesNum)
-            imageButtonHeart1.setCompoundDrawablesWithIntrinsicBounds(
-                if (!post.likedByMe) {
-                    root.context.getResources()
-                        .getDrawable(R.drawable.outline_favorite_border_24)
-                } else {
-                    root.context.getResources()
-                        .getDrawable(R.drawable.baseline_favorite_24)
-                }, null, null, null
-            )
+            imageButtonHeart1.isChecked = post.likedByMe
+//            imageButtonHeart1.setCompoundDrawablesWithIntrinsicBounds(
+//                if (!post.likedByMe) {
+//                    root.context.getResources()
+//                        .getDrawable(R.drawable.outline_favorite_border_24)
+//                } else {
+//                    root.context.getResources()
+//                        .getDrawable(R.drawable.baseline_favorite_24)
+//                }, null, null, null
+//            )
             imageButtonShare1.text = getFormatedNumber(post.sharesNum)
             imageButtonView1.text = getFormatedNumber(post.seenNum)
 
@@ -75,10 +76,12 @@ class PostViewHolder(val binding: PostCardBinding, private val callback: (Post, 
                             callback(post, "remove")
                             true
                         }
+
                         R.id.edit -> {
                             callback(post, "edit")
                             true
                         }
+
                         else -> false
                     }
                 }

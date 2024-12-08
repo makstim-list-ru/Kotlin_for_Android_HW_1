@@ -45,17 +45,20 @@
         app:layout_constraintTop_toBottomOf="@id/author1"
         tools:text="@sample/posts.json/data/published" />
 
-    <ImageButton
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/iButton1"
-        android:layout_width="48dp"
+        style="@style/Widget.Material3.Button.TextButton.Icon"
+        app:iconTint="?attr/colorControlNormal"
         android:layout_height="48dp"
-        android:background="?selectableItemBackground"
-        android:contentDescription="@string/menu_button_more_vert"
-        android:src="@drawable/baseline_more_vert_24"
+        android:layout_width="wrap_content"
+        android:minWidth="0dp"
+        android:contentDescription="Menu Button"
+        app:iconGravity="end"
+        app:icon="@drawable/baseline_more_vert_24"
         app:layout_constraintBottom_toBottomOf="@id/imageView1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/imageView1"
-        app:tint="?colorControlNormal" />
+        />
 
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/barrier1"
@@ -80,42 +83,43 @@
         app:barrierDirection="bottom"
         app:constraint_referenced_ids="content1" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/imageButtonHeart1"
+        android:checkable="true"
+        style="@style/Widget.App.LikeCheckBox1"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
-        android:layout_margin="16dp"
-        android:background="?selectableItemBackground"
         android:contentDescription="@string/like_button_descr"
-        android:drawableLeft="@drawable/outline_favorite_border_24"
-        android:text="5"
-        android:textColor="@color/black"
+        app:icon="@drawable/sel_like"
+        tools:text="5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/barrier2" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/imageButtonShare1"
+        style="@style/Widget.Material3.Button.TextButton.Icon"
+        app:iconTint="?attr/colorControlNormal"
+        android:textColor="?attr/colorControlNormal"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
-        android:layout_margin="16dp"
-        android:background="?selectableItemBackground"
-        android:contentDescription="@string/like_button_descr"
-        android:drawableLeft="@drawable/baseline_share_24"
-        android:text="5"
-        android:textColor="@color/black"
+        android:minWidth="0dp"
+        android:contentDescription="Share Button"
+        app:icon="@drawable/baseline_share_24"
+        tools:text="5"
         app:layout_constraintStart_toEndOf="@id/imageButtonHeart1"
         app:layout_constraintTop_toBottomOf="@id/barrier2" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/imageButtonView1"
+        style="@style/Widget.Material3.Button.TextButton.Icon"
+        app:iconTint="?attr/colorControlNormal"
+        android:textColor="?attr/colorControlNormal"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
-        android:layout_margin="16dp"
-        android:background="?selectableItemBackground"
-        android:contentDescription="@string/like_button_descr"
-        android:drawableLeft="@drawable/outline_visibility_24"
-        android:text="5"
-        android:textColor="@color/black"
+        android:minWidth="0dp"
+        android:contentDescription="Views Button"
+        app:icon="@drawable/outline_visibility_24"
+        tools:text="5"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/barrier2"
         />
