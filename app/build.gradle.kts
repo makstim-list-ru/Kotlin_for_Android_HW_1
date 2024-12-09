@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace = "ru.netology.kotlin_for_android_hw_1"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "ru.netology.kotlin_for_android_hw_1"
         minSdk = 23
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 

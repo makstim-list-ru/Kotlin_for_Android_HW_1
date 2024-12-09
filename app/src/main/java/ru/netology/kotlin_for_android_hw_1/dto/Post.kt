@@ -9,7 +9,8 @@ data class Post(
     val likedByMe: Boolean = false,
     val likesNum: Long = 999,
     val sharesNum: Long = 99,
-    val seenNum: Long = 9_999
+    val seenNum: Long = 9_999,
+    val video: String = ""
 
 )
 
@@ -22,7 +23,8 @@ val postEmpty = Post(
     likedByMe = false,
     likesNum = 0,
     sharesNum = 0,
-    seenNum = 0
+    seenNum = 0,
+    video = ""
 )
 
 

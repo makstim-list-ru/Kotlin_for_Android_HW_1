@@ -1,6 +1,7 @@
 package ru.netology.kotlin_for_android_hw_1.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.DiffUtil
@@ -43,28 +44,29 @@ class PostViewHolder(val binding: PostCardBinding, private val callback: (Post, 
             author1.text = post.author
             published1.text = post.published
             content1.text = post.content
+
+            if (post.video != "") {
+                videoButton.text = post.video
+                videoButton.visibility = View.VISIBLE
+            } else
+                videoButton.visibility = View.GONE
+
+            videoButton.setOnClickListener{
+                callback(post, "video")
+            }
+
             imageButtonHeart1.text = getFormatedNumber(post.likesNum)
             imageButtonHeart1.isChecked = post.likedByMe
-//            imageButtonHeart1.setCompoundDrawablesWithIntrinsicBounds(
-//                if (!post.likedByMe) {
-//                    root.context.getResources()
-//                        .getDrawable(R.drawable.outline_favorite_border_24)
-//                } else {
-//                    root.context.getResources()
-//                        .getDrawable(R.drawable.baseline_favorite_24)
-//                }, null, null, null
-//            )
+
             imageButtonShare1.text = getFormatedNumber(post.sharesNum)
             imageButtonView1.text = getFormatedNumber(post.seenNum)
 
             imageButtonHeart1.setOnClickListener {
                 callback(post, "like")
-                //viewModel.likeVM(post.id)
             }
 
             imageButtonShare1.setOnClickListener {
                 callback(post, "share")
-                //viewModel.shareVM(post.id)
             }
 
             iButton1.setOnClickListener { view ->
