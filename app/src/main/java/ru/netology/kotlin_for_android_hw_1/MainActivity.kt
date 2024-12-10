@@ -20,7 +20,10 @@ class MainActivity : AppCompatActivity() {
         val viewModel by viewModels<PostViewModel>()
 
         val getContent2 = registerForActivityResult(ContractMainActivity2) { result ->
-            result ?: return@registerForActivityResult
+            if (result==null) {
+                viewModel.cancelVM()
+                return@registerForActivityResult
+            }
             viewModel.saveVM(result)
         }
 
