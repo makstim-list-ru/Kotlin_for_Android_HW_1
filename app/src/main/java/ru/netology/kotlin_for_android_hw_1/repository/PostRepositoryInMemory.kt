@@ -6,7 +6,7 @@ import ru.netology.kotlin_for_android_hw_1.dto.Post
 
 class PostRepositoryInMemory : PostRepository {
     private var nextPostID = 1L
-    private var posts = listOf<Post>(
+    private var posts = listOf(
         Post(
             id = nextPostID++,
             author = "Нетология. Университет интернет-профессий будущего",

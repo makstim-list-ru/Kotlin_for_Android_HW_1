@@ -3,8 +3,6 @@ package ru.netology.kotlin_for_android_hw_1
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.view.View
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import ru.netology.kotlin_for_android_hw_1.adapter.PostsAdapter

@@ -6,7 +6,6 @@ import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import ru.netology.kotlin_for_android_hw_1.dto.Post
-import java.lang.IllegalStateException
 
 class PostRepositoryInFile(private val context: Context) : PostRepository {
 
@@ -17,52 +16,52 @@ class PostRepositoryInFile(private val context: Context) : PostRepository {
     }
 
     private var nextPostID = 1L
-    private var posts = listOf<Post>(
-        Post(
-            id = nextPostID++,
-            author = "Нетология. Университет интернет-профессий будущего",
-            published = "21 мая в 18:36",
-            content = "Много лет размышлял я над жизнью земной.\n" +
-                    "Непонятного нет для меня под луной.\n" +
-                    "Мне известно, что мне ничего не известно!\n" +
-                    "Вот последняя правда, открытая мной. → https://library.vladimir.ru/spravochnyj-material/omar2.html"
-        ),
-        Post(
-            id = nextPostID++,
-            author = "Нетология. Университет интернет-профессий будущего",
-            published = "21 мая в 18:36",
-            content = "Я — школяр в этом лучшем из лучших миров.\n" +
-                    "Труд мой тяжек: учитель уж больно суров!\n" +
-                    "До седин я у жизни хожу в подмастерьях,\n" +
-                    "Все еще не зачислен в разряд мастеров… → https://library.vladimir.ru/spravochnyj-material/omar2.html"
-        ),
-        Post(
-            id = nextPostID++,
-            author = "Нетология. Университет интернет-профессий будущего",
-            published = "21 мая в 18:36",
-            content = "Лучше впасть в нищету, голодать или красть,\n" +
-                    "Чем в число блюдолизов презренных попасть.\n" +
-                    "Лучше кости глодать, чем прельститься сластями\n" +
-                    "За столом у мерзавцев, имеющих власть. → https://library.vladimir.ru/spravochnyj-material/omar2.html"
-        ),
-        Post(
-            id = nextPostID++,
-            author = "Нетология. Университет интернет-профессий будущего",
-            published = "21 мая в 18:36",
-            content = "Не оплакивай, смертный, вчерашних потерь,\n" +
-                    "Дел сегодняшних завтрашней меркой не мерь,\n" +
-                    "Ни былой, ни грядущей минуте не верь,\n" +
-                    "Верь минуте текущей — будь счастлив теперь! → https://library.vladimir.ru/spravochnyj-material/omar2.html"
-        ),
-        Post(
-            id = nextPostID++,
-            author = "Нетология. Университет интернет-профессий будущего",
-            published = "21 мая в 18:36",
-            content = "Если все государства, вблизи и вдали,\n" +
-                    "Покоренные, будут валяться в пыли —\n" +
-                    "Ты не станешь, великий владыка, бессмертным.\n" +
-                    "Твой удел невелик: три аршина земли. → https://library.vladimir.ru/spravochnyj-material/omar2.html"
-        ),
+    private var posts = listOf(
+//        Post(
+//            id = nextPostID++,
+//            author = "Нетология. Университет интернет-профессий будущего",
+//            published = "21 мая в 18:36",
+//            content = "Много лет размышлял я над жизнью земной.\n" +
+//                    "Непонятного нет для меня под луной.\n" +
+//                    "Мне известно, что мне ничего не известно!\n" +
+//                    "Вот последняя правда, открытая мной. → https://library.vladimir.ru/spravochnyj-material/omar2.html"
+//        ),
+//        Post(
+//            id = nextPostID++,
+//            author = "Нетология. Университет интернет-профессий будущего",
+//            published = "21 мая в 18:36",
+//            content = "Я — школяр в этом лучшем из лучших миров.\n" +
+//                    "Труд мой тяжек: учитель уж больно суров!\n" +
+//                    "До седин я у жизни хожу в подмастерьях,\n" +
+//                    "Все еще не зачислен в разряд мастеров… → https://library.vladimir.ru/spravochnyj-material/omar2.html"
+//        ),
+//        Post(
+//            id = nextPostID++,
+//            author = "Нетология. Университет интернет-профессий будущего",
+//            published = "21 мая в 18:36",
+//            content = "Лучше впасть в нищету, голодать или красть,\n" +
+//                    "Чем в число блюдолизов презренных попасть.\n" +
+//                    "Лучше кости глодать, чем прельститься сластями\n" +
+//                    "За столом у мерзавцев, имеющих власть. → https://library.vladimir.ru/spravochnyj-material/omar2.html"
+//        ),
+//        Post(
+//            id = nextPostID++,
+//            author = "Нетология. Университет интернет-профессий будущего",
+//            published = "21 мая в 18:36",
+//            content = "Не оплакивай, смертный, вчерашних потерь,\n" +
+//                    "Дел сегодняшних завтрашней меркой не мерь,\n" +
+//                    "Ни былой, ни грядущей минуте не верь,\n" +
+//                    "Верь минуте текущей — будь счастлив теперь! → https://library.vladimir.ru/spravochnyj-material/omar2.html"
+//        ),
+//        Post(
+//            id = nextPostID++,
+//            author = "Нетология. Университет интернет-профессий будущего",
+//            published = "21 мая в 18:36",
+//            content = "Если все государства, вблизи и вдали,\n" +
+//                    "Покоренные, будут валяться в пыли —\n" +
+//                    "Ты не станешь, великий владыка, бессмертным.\n" +
+//                    "Твой удел невелик: три аршина земли. → https://library.vladimir.ru/spravochnyj-material/omar2.html"
+//        ),
         Post(
             id = nextPostID++,
             author = "Нетология. Университет интернет-профессий будущего",
@@ -83,12 +82,11 @@ class PostRepositoryInFile(private val context: Context) : PostRepository {
         if (file.exists()) {
             context.openFileInput(FILENAME).bufferedReader().use { it ->
                 posts = gson.fromJson(it, token)
-                nextPostID = posts.maxOf { it.id } + 1
+                nextPostID = if (posts.isNotEmpty()) posts.maxOf { it.id } + 1 else 1L
                 data.value = posts
             }
-        } else {
+        } else
             sync()
-        }
     }
 
     private fun sync() {
