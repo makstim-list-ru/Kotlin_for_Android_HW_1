@@ -3,22 +3,29 @@ package ru.netology.kotlin_for_android_hw_1
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import ru.netology.kotlin_for_android_hw_1.adapter.PostsAdapter
-import ru.netology.kotlin_for_android_hw_1.databinding.ActivityMainBinding
+import ru.netology.kotlin_for_android_hw_1.databinding.FragmentMainBinding
 import ru.netology.kotlin_for_android_hw_1.viewmodel.PostViewModel
 
-class MainActivity : AppCompatActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        val binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+class MainFragment : Fragment() {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val binding = FragmentMainBinding.inflate(inflater, container, false)
+
 
         val viewModel by viewModels<PostViewModel>()
 
         val getContent2 = registerForActivityResult(ContractMainActivity2) { result ->
-            if (result==null) {
+            if (result == null) {
                 viewModel.cancelVM()
                 return@registerForActivityResult
             }
@@ -50,7 +57,7 @@ class MainActivity : AppCompatActivity() {
         }
         binding.container.adapter = adapter
 
-        viewModel.data.observe(this) { posts ->
+        viewModel.data.observe(viewLifecycleOwner) { posts ->
             val newPostFlag = adapter.currentList.size < posts.size
             adapter.submitList(posts)
             if (newPostFlag) {
@@ -59,36 +66,10 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.plusButton.setOnClickListener {
-            getContent2.launch(null)
+            findNavController().navigate(R.id.action_mainFragment_to_editorFragment)
         }
 
 
-//        viewModel.editedPostLD.observe(this) {
-//            binding.content.setText(it.content)
-//            binding.content.requestFocus()
-//            if (it.id != 0L) {
-//                binding.preview1.setText(it.author)
-//                binding.preview2.setText(it.published)
-//                binding.group1.setVisibility(View.VISIBLE)
-//            } else binding.group1.setVisibility(View.GONE)
-//        }
-//
-//        binding.saveButton.setOnClickListener {
-//            val text = binding.content.text.toString()
-//            if (text.isBlank()) {
-//                Toast.makeText(this, "error empty content", Toast.LENGTH_LONG).show()
-//                return@setOnClickListener
-//            }
-//            viewModel.saveVM(text)
-//            binding.content.setText("")
-//            binding.content.clearFocus()
-//        }
-//
-//        binding.cancelEdit.setOnClickListener {
-//            binding.content.setText("")
-//            binding.content.clearFocus()
-//            viewModel.cancelVM()
-//            //binding.group1.setVisibility(View.GONE)
-//        }
+        return binding.root
     }
 }
