@@ -4,7 +4,7 @@
     <string name="avatarContentDescription" translatable="false">avatar</string>
     <string name="menu_button_more_vert" translatable="false">Menu</string>
     <string name="like_button_descr" translatable="false">Like Button</string>
-    <string name="large_text">
+    <string name="large_text" translatable="false">
         "Material is the metaphor.\n\n"
 
         "A material metaphor is the unifying theory of a rationalized space and a system of motion."
