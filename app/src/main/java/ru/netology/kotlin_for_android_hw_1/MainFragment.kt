@@ -9,6 +9,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import ru.netology.kotlin_for_android_hw_1.adapter.PostsAdapter
 import ru.netology.kotlin_for_android_hw_1.databinding.FragmentMainBinding
 import ru.netology.kotlin_for_android_hw_1.viewmodel.PostViewModel
@@ -54,7 +56,9 @@ class MainFragment : Fragment() {
             val newPostFlag = adapter.currentList.size < posts.size
             adapter.submitList(posts)
             if (newPostFlag) {
-                binding.container.smoothScrollToPosition(adapter.currentList.size)
+                var position = adapter.currentList.size
+//                if (position>1) position--
+                binding.container.scrollToPosition(position)
             }
         }
 

@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.snackbar.Snackbar
 import ru.netology.kotlin_for_android_hw_1.databinding.ActivityAppBinding
 
@@ -17,6 +18,9 @@ class AppActivity : AppCompatActivity() {
 
         val binding = ActivityAppBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
+        val navController = navHostFragment.navController
 
         intent?.let {
             if (it.action != Intent.ACTION_SEND) return@let
@@ -30,11 +34,17 @@ class AppActivity : AppCompatActivity() {
                 return@let
             }
 
-            findNavController(R.id.fragment_container)
+//            findNavController(R.id.fragment_container)
+//                .navigate(
+//                    R.id.action_mainFragment_to_editorFragment,
+//                    Bundle().apply { this.putString("TEXT_TRANSFER", text) }
+//                )
+            navController
                 .navigate(
                     R.id.action_mainFragment_to_editorFragment,
                     Bundle().apply { this.putString("TEXT_TRANSFER", text) }
                 )
+
         }
 
 
