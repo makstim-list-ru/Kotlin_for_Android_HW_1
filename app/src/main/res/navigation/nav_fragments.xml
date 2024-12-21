@@ -12,10 +12,22 @@
         <action
             android:id="@+id/action_mainFragment_to_editorFragment"
             app:destination="@id/editorFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_focusFragment"
+            app:destination="@id/focusFragment" />
     </fragment>
     <fragment
         android:id="@+id/editorFragment"
         android:name="ru.netology.kotlin_for_android_hw_1.EditorFragment"
         android:label="fragment_editor"
         tools:layout="@layout/fragment_editor" />
+    <fragment
+        android:id="@+id/focusFragment"
+        android:name="ru.netology.kotlin_for_android_hw_1.FocusFragment"
+        android:label="fragment_focus"
+        tools:layout="@layout/fragment_focus" >
+        <action
+            android:id="@+id/action_focusFragment_to_editorFragment"
+            app:destination="@id/editorFragment" />
+    </fragment>
 </navigation>

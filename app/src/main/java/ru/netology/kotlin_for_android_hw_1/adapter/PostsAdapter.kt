@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import ru.netology.kotlin_for_android_hw_1.R
 import ru.netology.kotlin_for_android_hw_1.databinding.PostCardBinding
 import ru.netology.kotlin_for_android_hw_1.dto.Post
+import kotlin.math.floor
 import kotlin.math.ln
 import kotlin.math.pow
 
@@ -37,7 +38,7 @@ object PostDiffUtil : DiffUtil.ItemCallback<Post>() {
     }
 }
 
-class PostViewHolder(val binding: PostCardBinding, private val callback: (Post, String) -> Unit) :
+class PostViewHolder(private val binding: PostCardBinding, private val callback: (Post, String) -> Unit) :
     RecyclerView.ViewHolder(binding.root) {
     fun onBindPost(post: Post) {
         with(binding) {
@@ -69,6 +70,16 @@ class PostViewHolder(val binding: PostCardBinding, private val callback: (Post, 
                 callback(post, "share")
             }
 
+            author1.setOnClickListener{
+                callback(post, "post")
+            }
+            published1.setOnClickListener{
+                callback(post, "post")
+            }
+            content1.setOnClickListener{
+                callback(post, "post")
+            }
+
             iButton1.setOnClickListener { view ->
                 val pum = PopupMenu(view.context, view)
                 pum.inflate(R.menu.menu_options)
@@ -92,7 +103,7 @@ class PostViewHolder(val binding: PostCardBinding, private val callback: (Post, 
         }
     }
 
-    fun getFormatedNumber(count: Long): String {
+    private fun getFormatedNumber(count: Long): String {
         if (count < 1000) return "" + count
         val exp = (ln(count.toDouble()) / ln(1000.0)).toInt()
         if (count / 1000.0.pow(exp.toDouble()) >= 10) {
@@ -100,7 +111,7 @@ class PostViewHolder(val binding: PostCardBinding, private val callback: (Post, 
         } else {
             return String.format(
                 "%.1f%c",
-                Math.floor(count / 1000.0.pow(exp.toDouble()) * 10) / 10,
+                floor(count / 1000.0.pow(exp.toDouble()) * 10) / 10,
                 "kMGTPE"[exp - 1]
             )
         }
