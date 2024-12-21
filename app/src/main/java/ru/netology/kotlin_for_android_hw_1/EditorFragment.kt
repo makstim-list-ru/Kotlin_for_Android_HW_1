@@ -9,7 +9,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import ru.netology.kotlin_for_android_hw_1.databinding.FragmentEditorBinding
+import ru.netology.kotlin_for_android_hw_1.viewmodel.PostViewModel
 
 class EditorFragment : Fragment() {
 
@@ -20,36 +23,21 @@ class EditorFragment : Fragment() {
     ): View? {
         val binding= FragmentEditorBinding.inflate(inflater,container,false)
 
+        val viewModel by viewModels<PostViewModel>(ownerProducer = ::requireParentFragment)
 
-        binding.content2.setText(activity?.intent?.getStringExtra(Intent.EXTRA_TEXT))
+        binding.content2.requestFocus()
+
+        binding.content2.setText(arguments?.getString("TEXT_TRANSFER"))
 
         binding.ok.setOnClickListener {
             val text = binding.content2.text.toString()
-            if (text.isBlank()) {
-                activity?.setResult(Activity.RESULT_CANCELED, null)
+            if (text.isNotBlank()) {
+                viewModel.saveVM(text)
             } else {
-                val intent = Intent().apply {
-                    putExtra(Intent.EXTRA_TEXT, text)
-                }
-                activity?.setResult(Activity.RESULT_OK, intent)
+                viewModel.cancelVM()
             }
-            activity?.finish()
+            findNavController().navigateUp()
         }
-
-
         return binding.root
     }
-}
-
-object ContractMainActivity2 : ActivityResultContract<String?, String?>() {
-    override fun createIntent(context: Context, input: String?): Intent {
-        return Intent(context, EditorFragment::class.java).apply {
-            putExtra(Intent.EXTRA_TEXT, input)
-        }
-    }
-
-    override fun parseResult(resultCode: Int, intent: Intent?): String? {
-        return intent?.getStringExtra(Intent.EXTRA_TEXT)
-    }
-
 }
