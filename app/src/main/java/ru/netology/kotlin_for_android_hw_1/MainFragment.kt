@@ -58,8 +58,8 @@ class MainFragment : Fragment() {
             val newPostFlag = adapter.currentList.size < posts.size
             adapter.submitList(posts)
             if (newPostFlag) {
-                val position = adapter.currentList.size
-//                if (position>1) position--
+                var position = adapter.currentList.size
+                if (position>1) position--
                 binding.container.scrollToPosition(position)
             }
         }
