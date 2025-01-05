@@ -28,10 +28,11 @@ class FocusFragment : Fragment() {
         val viewModel by viewModels<PostViewModel>(ownerProducer = ::requireParentFragment)
 
         val postID = arguments?.getString("TEXT_TRANSFER")?.toLong() ?: return binding.root
+
         var posts = viewModel.data.value ?: return binding.root
         var post = posts.filter { it.id == postID }[0]
 
-        onBindPost(post, binding)
+//        onBindPost(post, binding)
 
 
         with(binding.include) {
