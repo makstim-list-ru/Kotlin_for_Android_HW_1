@@ -46,4 +46,5 @@ interface PostDao {
     fun edit(post: PostEntity) {
         edit(post.id, post.content)
     }
+
 }

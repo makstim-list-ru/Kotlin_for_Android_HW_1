@@ -10,44 +10,7 @@ import ru.netology.kotlin_for_android_hw_1.roomdb.RoomDB
 
 class PostRepositoryInSQLwithRoom(context: Context) : PostRepository {
 
-    object PostColumns {
-        const val COLUMN_ID = "id"
-        const val COLUMN_AUTHOR = "author"
-        const val COLUMN_CONTENT = "content"
-        const val COLUMN_PUBLISHED = "published"
-        const val COLUMN_LIKED_BY_ME = "likedByMe"
-        const val COLUMN_LIKES = "likes"
-        const val COLUMN_SHARES = "shares"
-        const val COLUMN_SEEN = "seen"
-        const val COLUMN_VIDEO = "video"
-        val ALL_COLUMNS = arrayOf(
-            COLUMN_ID,
-            COLUMN_AUTHOR,
-            COLUMN_CONTENT,
-            COLUMN_PUBLISHED,
-            COLUMN_LIKED_BY_ME,
-            COLUMN_LIKES,
-            COLUMN_SHARES,
-            COLUMN_SEEN,
-            COLUMN_VIDEO
-        )
-    }
-
     companion object {
-        const val SQLNAME = "posts"
-        val CREATE_TABLE = """
-        CREATE TABLE $SQLNAME (
-            ${PostColumns.COLUMN_ID} INTEGER PRIMARY KEY AUTOINCREMENT,
-            ${PostColumns.COLUMN_AUTHOR} TEXT NOT NULL,
-            ${PostColumns.COLUMN_CONTENT} TEXT NOT NULL,
-            ${PostColumns.COLUMN_PUBLISHED} TEXT NOT NULL,
-            ${PostColumns.COLUMN_LIKED_BY_ME} BOOLEAN NOT NULL DEFAULT 0,
-            ${PostColumns.COLUMN_LIKES} INTEGER NOT NULL DEFAULT 0,
-            ${PostColumns.COLUMN_SHARES} INTEGER NOT NULL DEFAULT 0,
-            ${PostColumns.COLUMN_SEEN} INTEGER NOT NULL DEFAULT 0,
-            ${PostColumns.COLUMN_VIDEO} TEXT NOT NULL DEFAULT ""
-        );
-        """.trimIndent()
 
         private var nextPostID = 1L
         val posts = listOf(
@@ -106,57 +69,18 @@ class PostRepositoryInSQLwithRoom(context: Context) : PostRepository {
         )
     }
 
+    private val db =
+        Room.databaseBuilder(context, RoomDB::class.java, "database.db")
+            .allowMainThreadQueries()
+            .build()
 
-//    class PostsSQLdbHelper(context: Context) :
-//        SQLiteOpenHelper(context, SQLNAME, null, 1) {
-//        override fun onCreate(p0: SQLiteDatabase) {
-//            p0.execSQL(CREATE_TABLE)
-//
-//            posts.forEach {
-//                p0.execSQL(
-//                    """
-//                    INSERT INTO $SQLNAME
-//                    (${PostColumns.COLUMN_AUTHOR},${PostColumns.COLUMN_CONTENT},${PostColumns.COLUMN_PUBLISHED})
-//                    VALUES ("${it.author}","${it.content}","${it.published}")
-//                """.trimIndent()
-//                )
-//            }
-//        }
-//
-//        override fun onUpgrade(p0: SQLiteDatabase?, p1: Int, p2: Int) {
-//            TODO("Not yet implemented")
-//        }
-//
-//    }
-
-//    private fun map(cursor: Cursor): Post {
-//        with(cursor) {
-//            return Post(
-//                id = getLong(getColumnIndexOrThrow(PostColumns.COLUMN_ID)),
-//                author = getString(getColumnIndexOrThrow(PostColumns.COLUMN_AUTHOR)),
-//                content = getString(getColumnIndexOrThrow(PostColumns.COLUMN_CONTENT)),
-//                published = getString(getColumnIndexOrThrow(PostColumns.COLUMN_PUBLISHED)),
-//                likedByMe = getInt(getColumnIndexOrThrow(PostColumns.COLUMN_LIKED_BY_ME)) != 0,
-//                likesNum = getLong(getColumnIndexOrThrow(PostColumns.COLUMN_LIKES)),
-//                sharesNum = getLong(getColumnIndexOrThrow(PostColumns.COLUMN_SHARES)),
-//                seenNum = getLong(getColumnIndexOrThrow(PostColumns.COLUMN_SEEN)),
-//                video = getString(getColumnIndexOrThrow(PostColumns.COLUMN_VIDEO))
-//            )
-//        }
-//    }
-
-
-//    private val db = PostsSQLdbHelper(context).writableDatabase
-
-    private val db: RoomDB by lazy {
-        Room.databaseBuilder(context, RoomDB::class.java, "database.db").build().apply {
-            // TODO:  initial filling db
-        }
-    }
     private val dao = db.getPostDao()
 
-//    private val data = MutableLiveData(posts)
-
+    init {
+        posts.forEach {
+            dao.insert(PostEntity.fromPostToEntity(it))
+        }
+    }
 
     override fun getPostsAll(): LiveData<List<Post>> =
         dao.getPostsAll().map { it.map { it.toPostFromEntity() } }
