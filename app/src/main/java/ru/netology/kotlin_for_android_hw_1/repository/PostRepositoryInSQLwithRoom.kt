@@ -1,15 +1,14 @@
 package ru.netology.kotlin_for_android_hw_1.repository
 
-import android.content.ContentValues
 import android.content.Context
-import android.database.Cursor
-import android.database.sqlite.SQLiteDatabase
-import android.database.sqlite.SQLiteOpenHelper
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.map
+import androidx.room.Room
 import ru.netology.kotlin_for_android_hw_1.dto.Post
+import ru.netology.kotlin_for_android_hw_1.entity.PostEntity
+import ru.netology.kotlin_for_android_hw_1.roomdb.RoomDB
 
-class PostRepositoryInSQL(context: Context) : PostRepository {
+class PostRepositoryInSQLwithRoom(context: Context) : PostRepository {
 
     object PostColumns {
         const val COLUMN_ID = "id"
@@ -108,150 +107,76 @@ class PostRepositoryInSQL(context: Context) : PostRepository {
     }
 
 
-    class PostsSQLdbHelper(context: Context) :
-        SQLiteOpenHelper(context, SQLNAME, null, 1) {
-        override fun onCreate(p0: SQLiteDatabase) {
-            p0.execSQL(CREATE_TABLE)
+//    class PostsSQLdbHelper(context: Context) :
+//        SQLiteOpenHelper(context, SQLNAME, null, 1) {
+//        override fun onCreate(p0: SQLiteDatabase) {
+//            p0.execSQL(CREATE_TABLE)
+//
+//            posts.forEach {
+//                p0.execSQL(
+//                    """
+//                    INSERT INTO $SQLNAME
+//                    (${PostColumns.COLUMN_AUTHOR},${PostColumns.COLUMN_CONTENT},${PostColumns.COLUMN_PUBLISHED})
+//                    VALUES ("${it.author}","${it.content}","${it.published}")
+//                """.trimIndent()
+//                )
+//            }
+//        }
+//
+//        override fun onUpgrade(p0: SQLiteDatabase?, p1: Int, p2: Int) {
+//            TODO("Not yet implemented")
+//        }
+//
+//    }
 
-            posts.forEach {
-                p0.execSQL(
-                    """
-                    INSERT INTO $SQLNAME 
-                    (${PostColumns.COLUMN_AUTHOR},${PostColumns.COLUMN_CONTENT},${PostColumns.COLUMN_PUBLISHED}) 
-                    VALUES ("${it.author}","${it.content}","${it.published}")
-                """.trimIndent()
-                )
-            }
+//    private fun map(cursor: Cursor): Post {
+//        with(cursor) {
+//            return Post(
+//                id = getLong(getColumnIndexOrThrow(PostColumns.COLUMN_ID)),
+//                author = getString(getColumnIndexOrThrow(PostColumns.COLUMN_AUTHOR)),
+//                content = getString(getColumnIndexOrThrow(PostColumns.COLUMN_CONTENT)),
+//                published = getString(getColumnIndexOrThrow(PostColumns.COLUMN_PUBLISHED)),
+//                likedByMe = getInt(getColumnIndexOrThrow(PostColumns.COLUMN_LIKED_BY_ME)) != 0,
+//                likesNum = getLong(getColumnIndexOrThrow(PostColumns.COLUMN_LIKES)),
+//                sharesNum = getLong(getColumnIndexOrThrow(PostColumns.COLUMN_SHARES)),
+//                seenNum = getLong(getColumnIndexOrThrow(PostColumns.COLUMN_SEEN)),
+//                video = getString(getColumnIndexOrThrow(PostColumns.COLUMN_VIDEO))
+//            )
+//        }
+//    }
+
+
+//    private val db = PostsSQLdbHelper(context).writableDatabase
+
+    private val db: RoomDB by lazy {
+        Room.databaseBuilder(context, RoomDB::class.java, "database.db").build().apply {
+            // TODO:  initial filling db
         }
-
-        override fun onUpgrade(p0: SQLiteDatabase?, p1: Int, p2: Int) {
-            TODO("Not yet implemented")
-        }
-
     }
+    private val dao = db.getPostDao()
 
-    private fun map(cursor: Cursor): Post {
-        with(cursor) {
-            return Post(
-                id = getLong(getColumnIndexOrThrow(PostColumns.COLUMN_ID)),
-                author = getString(getColumnIndexOrThrow(PostColumns.COLUMN_AUTHOR)),
-                content = getString(getColumnIndexOrThrow(PostColumns.COLUMN_CONTENT)),
-                published = getString(getColumnIndexOrThrow(PostColumns.COLUMN_PUBLISHED)),
-                likedByMe = getInt(getColumnIndexOrThrow(PostColumns.COLUMN_LIKED_BY_ME)) != 0,
-                likesNum = getLong(getColumnIndexOrThrow(PostColumns.COLUMN_LIKES)),
-                sharesNum = getLong(getColumnIndexOrThrow(PostColumns.COLUMN_SHARES)),
-                seenNum = getLong(getColumnIndexOrThrow(PostColumns.COLUMN_SEEN)),
-                video = getString(getColumnIndexOrThrow(PostColumns.COLUMN_VIDEO))
+//    private val data = MutableLiveData(posts)
+
+
+    override fun getPostsAll(): LiveData<List<Post>> =
+        dao.getPostsAll().map { it.map { it.toPostFromEntity() } }
+
+    override fun likeByID(id: Long) = dao.likeByID(id)
+
+    override fun shareByID(id: Long) = dao.shareByID(id)
+
+    override fun removeByID(id: Long) = dao.removeByID(id)
+
+    override fun save(post: Post) = dao.save(
+        PostEntity.fromPostToEntity(
+            post.copy(
+                author = "Me",
+                published = "Now",
+                content = post.content
             )
-        }
-    }
-
-
-    private val db = PostsSQLdbHelper(context).writableDatabase
-    private val data = MutableLiveData(posts)
-
-
-    override fun getPostsAll(): LiveData<List<Post>> {
-        val posts = mutableListOf<Post>()
-        db.query(
-            SQLNAME,
-            PostColumns.ALL_COLUMNS,
-            null,
-            null,
-            null,
-            null,
-            "${PostColumns.COLUMN_ID} DESC"
-        ).use {
-            while (it.moveToNext()) {
-                posts.add(map(it))
-            }
-        }
-        data.value = posts
-        return data
-    }
-
-    override fun likeByID(id: Long) {
-        db.execSQL(
-            """
-           UPDATE $SQLNAME SET
-               likes = likes + CASE WHEN likedByMe THEN -1 ELSE 1 END,
-               likedByMe = CASE WHEN likedByMe THEN 0 ELSE 1 END
-           WHERE id = ?;
-        """.trimIndent(), arrayOf(id)
         )
-        var posts = data.value
-        posts = posts?.map {
-            if (it.id != id) it else it.copy(
-                likedByMe = !it.likedByMe,
-                likesNum = if (it.likedByMe) it.likesNum - 1 else it.likesNum + 1
-            )
-        }
-        data.value = posts
-    }
+    )
 
-    override fun shareByID(id: Long) {
-        db.execSQL(
-            """
-           UPDATE $SQLNAME SET
-               shares = shares + 1
-           WHERE id = ?;
-        """.trimIndent(), arrayOf(id)
-        )
-        var posts = data.value
-        posts = posts?.map {
-            if (it.id != id) it else it.copy(
-                sharesNum = it.sharesNum + 1
-            )
-        }
-        data.value = posts
-    }
-
-    override fun removeByID(id: Long) {
-        db.delete(
-            SQLNAME,
-            "${PostColumns.COLUMN_ID} = ?",
-            arrayOf(id.toString())
-        )
-        var posts = data.value
-        posts = posts?.filter { it.id != id }
-        data.value = posts
-    }
-
-    override fun save(post: Post) {
-
-        val values = ContentValues().apply {
-            // TODO: remove hardcoded values
-            put(PostColumns.COLUMN_AUTHOR, "Me")
-            put(PostColumns.COLUMN_CONTENT, post.content)
-            put(PostColumns.COLUMN_PUBLISHED, "now")
-        }
-
-        db.insert(SQLNAME, null, values)
-
-        var posts = data.value
-        posts = posts?.plus(post.copy(id = nextPostID++, author = "Me", published = "Now"))
-        data.value = posts
-    }
-
-    override fun edit(post: Post) {
-
-        val values = ContentValues().apply {
-            // TODO: remove hardcoded values
-            put(PostColumns.COLUMN_CONTENT, post.content)
-        }
-
-        db.update(
-            SQLNAME,
-            values,
-            "${PostColumns.COLUMN_ID} = ?",
-            arrayOf(post.id.toString()),
-        )
-
-        var posts = data.value
-        posts = posts?.map {
-            if (it.id != post.id) it else it.copy(content = post.content)
-        }
-        data.value = posts
-    }
+    override fun edit(post: Post) = dao.edit(PostEntity.fromPostToEntity(post))
 }
 
