@@ -8,7 +8,7 @@ import ru.netology.kotlin_for_android_hw_1.entity.PostEntity
 
 @Dao
 interface PostDao {
-    @Query("SELECT * FROM PostEntity ORDER BY id DESC")
+    @Query("SELECT * FROM PostEntity ORDER BY id ASC")
     fun getPostsAll(): LiveData<List<PostEntity>>
 
     @Insert
@@ -46,5 +46,8 @@ interface PostDao {
     fun edit(post: PostEntity) {
         edit(post.id, post.content)
     }
+
+    @Query("SELECT EXISTS(SELECT 1 FROM PostEntity)")
+    fun hasTable(): Boolean
 
 }

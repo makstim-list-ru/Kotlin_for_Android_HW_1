@@ -73,14 +73,16 @@ class PostRepositoryInSQLwithRoom(context: Context) : PostRepository {
         Room.databaseBuilder(context, RoomDB::class.java, "database.db")
             .allowMainThreadQueries()
             .build()
+            .apply {
+                val dao = this.getPostDao()
+                if (!dao.hasTable())
+                    posts.forEach {
+                        dao.insert(PostEntity.fromPostToEntity(it))
+                    }
+            }
 
     private val dao = db.getPostDao()
 
-    init {
-        posts.forEach {
-            dao.insert(PostEntity.fromPostToEntity(it))
-        }
-    }
 
     override fun getPostsAll(): LiveData<List<Post>> =
         dao.getPostsAll().map { it.map { it.toPostFromEntity() } }
