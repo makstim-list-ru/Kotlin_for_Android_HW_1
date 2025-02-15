@@ -53,6 +53,13 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     kapt("androidx.room:room-compiler:2.6.1")
 
+    // define a BOM and its version
+    implementation(platform(libs.okhttp.bom))
+
+    // define any required OkHttp artifacts without version
+    implementation(libs.okhttp)
+    implementation(libs.logging.interceptor)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

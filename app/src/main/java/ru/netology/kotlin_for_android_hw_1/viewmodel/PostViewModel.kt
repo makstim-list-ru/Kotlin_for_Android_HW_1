@@ -8,13 +8,15 @@ import ru.netology.kotlin_for_android_hw_1.dto.postEmpty
 import ru.netology.kotlin_for_android_hw_1.repository.PostRepositoryInFile
 import ru.netology.kotlin_for_android_hw_1.repository.PostRepositoryInSQL
 import ru.netology.kotlin_for_android_hw_1.repository.PostRepositoryInSQLwithRoom
+import ru.netology.kotlin_for_android_hw_1.repository.PostRepositoryInServer
 
 class PostViewModel(application: Application) : AndroidViewModel(application) {
 
     //    private val repository = PostRepositoryInMemory()
 //    private val repository = PostRepositoryInFile(application)
 //    private val repository = PostRepositoryInSQL(application)
-    private val repository = PostRepositoryInSQLwithRoom(application)
+//    private val repository = PostRepositoryInSQLwithRoom(application)
+    private val repository = PostRepositoryInServer(application)
 
     val data = repository.getPostsAll()
     private val editedPostLD = MutableLiveData(postEmpty)
