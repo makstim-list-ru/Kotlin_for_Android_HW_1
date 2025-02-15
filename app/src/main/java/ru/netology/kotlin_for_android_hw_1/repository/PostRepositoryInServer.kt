@@ -108,15 +108,8 @@ class PostRepositoryInServer(context: Context) : PostRepository {
             if (posts.isEmpty()) servStat.postValue(serverStatusChange("empty"))
             else servStat.postValue(serverStatusChange("OK"))
 
-//            val tst1 = posts?.get(0)
-//            val tst2= posts?.get(1)
-
             data.postValue(posts)
         }
-//        val tst1 = data.value?.get(0)
-//        val tst2= data.value?.get(1)
-
-
         return data
     }
 
