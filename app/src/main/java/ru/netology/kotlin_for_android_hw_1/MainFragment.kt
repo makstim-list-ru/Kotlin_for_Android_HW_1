@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -59,10 +60,17 @@ class MainFragment : Fragment() {
             adapter.submitList(posts)
             if (newPostFlag) {
                 var position = adapter.currentList.size
-                if (position>1) position--
+                if (position > 1) position--
                 binding.container.scrollToPosition(position)
             }
         }
+
+        viewModel._data.observe(viewLifecycleOwner) { state ->
+            binding.progress.isVisible = state.loading
+            binding.errorGroup.isVisible = state.error
+            binding.emptyText.isVisible = state.empty
+        }
+
 
         binding.plusButton.setOnClickListener {
             findNavController().navigate(R.id.action_mainFragment_to_editorFragment)

@@ -11,6 +11,7 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.internal.EMPTY_REQUEST
 import ru.netology.kotlin_for_android_hw_1.dto.Post
+import ru.netology.kotlin_for_android_hw_1.model.FeedModel
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
@@ -85,10 +86,13 @@ class PostRepositoryInServer(context: Context) : PostRepository {
     }
 
     private val data = MutableLiveData(posts)
+    private val servStat = MutableLiveData(FeedModel())
 
     override fun getPostsAll(): LiveData<List<Post>> {
 
         thread {
+            servStat.postValue(serverStatusChange("loading"))
+
             val posts: MutableList<Post>
 
             val request: Request = Request.Builder()
@@ -101,10 +105,32 @@ class PostRepositoryInServer(context: Context) : PostRepository {
                 .let {
                     gson.fromJson(it, typeToken.type)
                 }
+            if (posts.isEmpty()) servStat.postValue(serverStatusChange("empty"))
+            else servStat.postValue(serverStatusChange("OK"))
+
+//            val tst1 = posts?.get(0)
+//            val tst2= posts?.get(1)
+
             data.postValue(posts)
         }
+//        val tst1 = data.value?.get(0)
+//        val tst2= data.value?.get(1)
+
+
         return data
     }
+
+    private fun serverStatusChange(status: String): FeedModel {
+        return when (status) {
+            "loading" -> FeedModel(loading = true)
+            "error" -> FeedModel(error = true)
+            "empty" -> FeedModel(empty = true)
+            "refreshing" -> FeedModel(refreshing = true)
+            else -> FeedModel()
+        }
+    }
+
+    fun getServerStatus() = servStat
 
     override fun likeByID(id: Long) {
 
@@ -176,8 +202,11 @@ class PostRepositoryInServer(context: Context) : PostRepository {
 
     override fun save(post: Post) {
         thread {
+
+            val myPost = post.copy(author = "Me", published = "Now")
             val request: Request = Request.Builder()
-                .post(gson.toJson(post).toRequestBody(jsonType))
+                .post(gson.toJson(myPost)
+                    .toRequestBody(jsonType))
                 .url("${BASE_URL}/api/slow/posts")
                 .build()
 

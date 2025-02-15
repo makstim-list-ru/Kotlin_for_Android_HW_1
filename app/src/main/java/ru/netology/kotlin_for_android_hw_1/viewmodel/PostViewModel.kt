@@ -5,9 +5,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import ru.netology.kotlin_for_android_hw_1.dto.Post
 import ru.netology.kotlin_for_android_hw_1.dto.postEmpty
-import ru.netology.kotlin_for_android_hw_1.repository.PostRepositoryInFile
-import ru.netology.kotlin_for_android_hw_1.repository.PostRepositoryInSQL
-import ru.netology.kotlin_for_android_hw_1.repository.PostRepositoryInSQLwithRoom
 import ru.netology.kotlin_for_android_hw_1.repository.PostRepositoryInServer
 
 class PostViewModel(application: Application) : AndroidViewModel(application) {
@@ -18,8 +15,12 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 //    private val repository = PostRepositoryInSQLwithRoom(application)
     private val repository = PostRepositoryInServer(application)
 
+    val _data = repository.getServerStatus()
+
     val data = repository.getPostsAll()
+
     private val editedPostLD = MutableLiveData(postEmpty)
+
 
     fun likeVM(id: Long) {
         repository.likeByID(id)
