@@ -118,6 +118,7 @@ class PostRepositoryInServer(context: Context) : PostRepository {
     }
 
 //    fun getAllAsync(callback: PostRepository.GetAllCallback) {
+//
 //        val request: Request = Request.Builder()
 //            .url("${BASE_URL}/api/slow/posts")
 //            .build()
