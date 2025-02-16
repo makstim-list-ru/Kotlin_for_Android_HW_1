@@ -10,6 +10,7 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import ru.netology.kotlin_for_android_hw_1.apputils.NetologyUtilities.getFormatedNumber
 import ru.netology.kotlin_for_android_hw_1.databinding.FragmentFocusBinding
 import ru.netology.kotlin_for_android_hw_1.dto.Post
@@ -81,6 +82,14 @@ class FocusFragment : Fragment() {
                 }
                 pum.show()
             }
+
+            val url = "http://10.0.2.2:9999/avatars/${post.authorAvatar}"
+            Glide.with(binding.include.imageView1)
+                .load(url)
+                .placeholder(R.drawable.ic_loading_100dp)
+                .error(R.drawable.ic_error_100dp)
+                .timeout(10_000)
+                .into(binding.include.imageView1)
 
         }
 

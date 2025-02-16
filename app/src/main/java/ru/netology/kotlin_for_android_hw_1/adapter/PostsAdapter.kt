@@ -7,6 +7,7 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import ru.netology.kotlin_for_android_hw_1.R
 import ru.netology.kotlin_for_android_hw_1.databinding.PostCardBinding
 import ru.netology.kotlin_for_android_hw_1.dto.Post
@@ -41,6 +42,7 @@ object PostDiffUtil : DiffUtil.ItemCallback<Post>() {
 class PostViewHolder(private val binding: PostCardBinding, private val callback: (Post, String) -> Unit) :
     RecyclerView.ViewHolder(binding.root) {
     fun onBindPost(post: Post) {
+
         with(binding) {
             author1.text = post.author
             published1.text = post.published
@@ -100,6 +102,14 @@ class PostViewHolder(private val binding: PostCardBinding, private val callback:
                 }
                 pum.show()
             }
+
+            val url = "http://10.0.2.2:9999/avatars/${post.authorAvatar}"
+            Glide.with(binding.imageView1)
+                .load(url)
+                .placeholder(R.drawable.ic_loading_100dp)
+                .error(R.drawable.ic_error_100dp)
+                .timeout(10_000)
+                .into(binding.imageView1)
         }
     }
 

@@ -51,6 +51,7 @@ dependencies {
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.gson)
     implementation(libs.androidx.room.runtime)
+    implementation(libs.glide)
     kapt("androidx.room:room-compiler:2.6.1")
 
     // define a BOM and its version
