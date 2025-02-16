@@ -17,7 +17,8 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
     val _data = repository.getServerStatus()
 
-    val data = repository.getPostsAll()
+    //    val data = repository.getPostsAll()
+    val data = repository.getPostsAllAsync()
 
     private val editedPostLD = MutableLiveData(postEmpty)
 
@@ -50,5 +51,9 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
     fun cancelVM() {
         editedPostLD.value = postEmpty
+    }
+
+    fun loadAllPostsVM(){
+        repository.getPostsAllAsync()
     }
 }

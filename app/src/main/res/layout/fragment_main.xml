@@ -15,25 +15,28 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:text="Error loading"
+        android:background="@color/cardview_light_background"
         app:layout_constraintBottom_toTopOf="@+id/retryButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed" />
 
-    <Button
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/retryButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:contentDescription="retryButton"
         android:text="Try again"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/retryTitle" />
+        app:layout_constraintTop_toBottomOf="@id/retryTitle"
+        app:srcCompat="@drawable/baseline_replay_24"/>
 
     <androidx.constraintlayout.widget.Group
         android:id="@+id/errorGroup"
-        android:visibility="gone"
+
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:constraint_referenced_ids="retryTitle,retryButton" />
