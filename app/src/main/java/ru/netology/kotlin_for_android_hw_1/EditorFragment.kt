@@ -17,7 +17,7 @@ class EditorFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val binding= FragmentEditorBinding.inflate(inflater,container,false)
+        val binding = FragmentEditorBinding.inflate(inflater, container, false)
 
         val viewModel by viewModels<PostViewModel>(ownerProducer = ::requireParentFragment)
 
@@ -28,9 +28,9 @@ class EditorFragment : Fragment() {
         binding.ok.setOnClickListener {
             val text = binding.content2.text.toString()
             if (text.isNotBlank()) {
-                viewModel.saveVM(text)
+                viewModel.saveViewModel(text)
             } else {
-                viewModel.cancelVM()
+                viewModel.cancelViewModel()
             }
             findNavController().navigateUp()
         }

@@ -9,6 +9,6 @@ interface PostRepository {
     fun shareByID(id: Long)
     fun removeByID(id: Long)
     fun save(post: Post)
-    fun edit (post: Post)
+    fun edit(post: Post)
 
 }

@@ -39,7 +39,10 @@ object PostDiffUtil : DiffUtil.ItemCallback<Post>() {
     }
 }
 
-class PostViewHolder(private val binding: PostCardBinding, private val callback: (Post, String) -> Unit) :
+class PostViewHolder(
+    private val binding: PostCardBinding,
+    private val callback: (Post, String) -> Unit
+) :
     RecyclerView.ViewHolder(binding.root) {
     fun onBindPost(post: Post) {
 
@@ -54,7 +57,7 @@ class PostViewHolder(private val binding: PostCardBinding, private val callback:
             } else
                 videoButton.visibility = View.GONE
 
-            videoButton.setOnClickListener{
+            videoButton.setOnClickListener {
                 callback(post, "video")
             }
 
@@ -72,13 +75,13 @@ class PostViewHolder(private val binding: PostCardBinding, private val callback:
                 callback(post, "share")
             }
 
-            author1.setOnClickListener{
+            author1.setOnClickListener {
                 callback(post, "post")
             }
-            published1.setOnClickListener{
+            published1.setOnClickListener {
                 callback(post, "post")
             }
-            content1.setOnClickListener{
+            content1.setOnClickListener {
                 callback(post, "post")
             }
 

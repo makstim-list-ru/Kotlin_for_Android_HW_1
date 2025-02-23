@@ -26,7 +26,7 @@ class MainFragment : Fragment() {
         val viewModel by viewModels<PostViewModel>(ownerProducer = ::requireParentFragment)
 
         val adapter = PostsAdapter { post, key ->
-            if (key == "like") viewModel.likeVM(post.id)
+            if (key == "like") viewModel.likeViewModel(post.id)
             if (key == "share") {
                 val intent = Intent().apply {
                     putExtra(Intent.EXTRA_TEXT, post.content)
@@ -35,19 +35,19 @@ class MainFragment : Fragment() {
                 }
                 val shareIntent = Intent.createChooser(intent, "Sharing the post")
                 startActivity(shareIntent)
-                viewModel.shareVM(post.id)
+                viewModel.shareViewModel(post.id)
             }
             if (key == "video") {
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse(post.video))
                 startActivity(intent)
             }
-            if (key == "remove") viewModel.removeVM(post.id)
+            if (key == "remove") viewModel.removeViewModel(post.id)
             if (key == "edit") {
                 findNavController().navigate(R.id.action_mainFragment_to_editorFragment,
                     Bundle().apply { this.putString("TEXT_TRANSFER", post.content) })
-                viewModel.editVM(post)
+                viewModel.editViewModel(post)
             }
-            if (key == "cancel") viewModel.cancelVM()
+            if (key == "cancel") viewModel.cancelViewModel()
             if (key == "post") {
                 findNavController().navigate(R.id.action_mainFragment_to_focusFragment,
                     Bundle().apply { this.putString("TEXT_TRANSFER", post.id.toString()) })
@@ -65,7 +65,7 @@ class MainFragment : Fragment() {
             }
         }
 
-        viewModel._data.observe(viewLifecycleOwner) { state ->
+        viewModel.dataServerStatus.observe(viewLifecycleOwner) { state ->
             binding.progress.isVisible = state.loading
             binding.errorGroup.isVisible = state.error
             binding.emptyText.isVisible = state.empty
@@ -77,7 +77,7 @@ class MainFragment : Fragment() {
         }
 
         binding.retryButton.setOnClickListener {
-            viewModel.loadAllPostsVM()
+            viewModel.loadAllPostsViewModel()
         }
 
 

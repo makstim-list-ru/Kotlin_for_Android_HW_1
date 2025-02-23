@@ -39,7 +39,7 @@ class FocusFragment : Fragment() {
         with(binding.include) {
 
             imageButtonHeart1.setOnClickListener {
-                viewModel.likeVM(post.id)
+                viewModel.likeViewModel(post.id)
 //                posts = viewModel.data.value ?: return@setOnClickListener
 //                post = posts.filter { it.id == postID }[0]
 //                onBindPost(post, binding)
@@ -53,7 +53,7 @@ class FocusFragment : Fragment() {
                 }
                 val shareIntent = Intent.createChooser(intent, "Sharing the post")
                 startActivity(shareIntent)
-                viewModel.shareVM(post.id)
+                viewModel.shareViewModel(post.id)
 //                posts = viewModel.data.value ?: return@setOnClickListener
 //                post = posts.filter { it.id == postID }[0]
 //                onBindPost(post, binding)
@@ -65,7 +65,7 @@ class FocusFragment : Fragment() {
                 pum.setOnMenuItemClickListener {
                     when (it.itemId) {
                         R.id.remove -> {
-                            viewModel.removeVM(post.id)
+                            viewModel.removeViewModel(post.id)
                             findNavController().navigateUp()
                             true
                         }
@@ -73,7 +73,7 @@ class FocusFragment : Fragment() {
                         R.id.edit -> {
                             findNavController().navigate(R.id.action_focusFragment_to_editorFragment,
                                 Bundle().apply { this.putString("TEXT_TRANSFER", post.content) })
-                            viewModel.editVM(post)
+                            viewModel.editViewModel(post)
                             true
                         }
 

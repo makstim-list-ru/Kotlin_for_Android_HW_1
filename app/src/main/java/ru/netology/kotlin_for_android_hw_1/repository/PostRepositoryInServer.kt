@@ -13,6 +13,7 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import okhttp3.internal.EMPTY_REQUEST
+import ru.netology.kotlin_for_android_hw_1.apputils.NetologyUtilities
 import ru.netology.kotlin_for_android_hw_1.dto.Post
 import ru.netology.kotlin_for_android_hw_1.model.FeedModel
 import java.io.IOException
@@ -30,72 +31,41 @@ class PostRepositoryInServer(context: Context) : PostRepository {
     companion object {
 
         private var nextPostID = 1L
-        val posts = listOf(
-            Post(
-                id = nextPostID++,
-                author = "Нетология. Университет интернет-профессий будущего",
-                published = "21 мая в 18:36",
-                content = "Много лет размышлял я над жизнью земной.\n" +
-                        "Непонятного нет для меня под луной.\n" +
-                        "Мне известно, что мне ничего не известно!\n" +
-                        "Вот последняя правда, открытая мной. → https://library.vladimir.ru/spravochnyj-material/omar2.html"
-            ),
-            Post(
-                id = nextPostID++,
-                author = "Нетология. Университет интернет-профессий будущего",
-                published = "21 мая в 18:36",
-                content = "Я — школяр в этом лучшем из лучших миров.\n" +
-                        "Труд мой тяжек: учитель уж больно суров!\n" +
-                        "До седин я у жизни хожу в подмастерьях,\n" +
-                        "Все еще не зачислен в разряд мастеров… → https://library.vladimir.ru/spravochnyj-material/omar2.html"
-            ),
-            Post(
-                id = nextPostID++,
-                author = "Нетология. Университет интернет-профессий будущего",
-                published = "21 мая в 18:36",
-                content = "Лучше впасть в нищету, голодать или красть,\n" +
-                        "Чем в число блюдолизов презренных попасть.\n" +
-                        "Лучше кости глодать, чем прельститься сластями\n" +
-                        "За столом у мерзавцев, имеющих власть. → https://library.vladimir.ru/spravochnyj-material/omar2.html"
-            ),
-            Post(
-                id = nextPostID++,
-                author = "Нетология. Университет интернет-профессий будущего",
-                published = "21 мая в 18:36",
-                content = "Не оплакивай, смертный, вчерашних потерь,\n" +
-                        "Дел сегодняшних завтрашней меркой не мерь,\n" +
-                        "Ни былой, ни грядущей минуте не верь,\n" +
-                        "Верь минуте текущей — будь счастлив теперь! → https://library.vladimir.ru/spravochnyj-material/omar2.html"
-            ),
-            Post(
-                id = nextPostID++,
-                author = "Нетология. Университет интернет-профессий будущего",
-                published = "21 мая в 18:36",
-                content = "Если все государства, вблизи и вдали,\n" +
-                        "Покоренные, будут валяться в пыли —\n" +
-                        "Ты не станешь, великий владыка, бессмертным.\n" +
-                        "Твой удел невелик: три аршина земли. → https://library.vladimir.ru/spravochnyj-material/omar2.html"
-            ),
-            Post(
-                id = nextPostID++,
-                author = "Нетология. Университет интернет-профессий будущего",
-                published = "21 мая в 18:36",
-                content = "Привет, это новая Нетология! Когда-то Нетология начиналась с интенсивов по онлайн-маркетингу. Затем появились курсы по дизайну, разработке, аналитике и управлению. Мы растём сами и помогаем расти студентам: от новичков до уверенных профессионалов. Но самое важное остаётся с нами: мы верим, что в каждом уже есть сила, которая заставляет хотеть больше, целиться выше, бежать быстрее. Наша миссия — помочь встать на путь роста и начать цепочку перемен → http://netolo.gy/fyb",
-                video = "https://www.youtube.com/watch?v=WhWc3b3KhnY"
-            )
-        )
+        val posts = NetologyUtilities.samplePosts(nextPostID)
+
+        init {
+            nextPostID += posts.size
+        }
 
         private const val BASE_URL = "http://10.0.2.2:9999"
         private val jsonType = "application/json".toMediaType()
     }
 
-    private val data = MutableLiveData(posts)
+    private enum class ServerStatusFlag {
+        LOADING, ERROR, EMPTY, REFRESHING, OK
+    }
+
+    private fun serverStatusChange(status: ServerStatusFlag): FeedModel {
+        return when (status) {
+            ServerStatusFlag.LOADING -> FeedModel(loading = true)
+            ServerStatusFlag.ERROR -> FeedModel(error = true)
+            ServerStatusFlag.EMPTY -> FeedModel(empty = true)
+            ServerStatusFlag.REFRESHING -> FeedModel(refreshing = true)
+            else -> FeedModel()
+        }
+    }
+
+
+    //    private val data = MutableLiveData(posts)
+    private val data = MutableLiveData(emptyList<Post>())
+    fun getData() = data
+
     private val servStat = MutableLiveData(FeedModel())
 
     override fun getPostsAll(): LiveData<List<Post>> {
 
         thread {
-            servStat.postValue(serverStatusChange("loading"))
+            servStat.postValue(serverStatusChange(ServerStatusFlag.LOADING))
 
             val posts: MutableList<Post>
 
@@ -109,8 +79,8 @@ class PostRepositoryInServer(context: Context) : PostRepository {
                 .let {
                     gson.fromJson(it, typeToken.type)
                 }
-            if (posts.isEmpty()) servStat.postValue(serverStatusChange("empty"))
-            else servStat.postValue(serverStatusChange("OK"))
+            if (posts.isEmpty()) servStat.postValue(serverStatusChange(ServerStatusFlag.EMPTY))
+            else servStat.postValue(serverStatusChange(ServerStatusFlag.OK))
 
             data.postValue(posts)
         }
@@ -123,7 +93,7 @@ class PostRepositoryInServer(context: Context) : PostRepository {
             .url("${BASE_URL}/api/slow/posts")
             .build()
 
-        servStat.value = serverStatusChange("loading")
+        servStat.value = serverStatusChange(ServerStatusFlag.LOADING)
 
         client.newCall(request)
             .enqueue(object : Callback {
@@ -132,28 +102,18 @@ class PostRepositoryInServer(context: Context) : PostRepository {
                     try {
                         val posts: List<Post> = gson.fromJson(body, typeToken.type)
                         data.postValue(posts)
-                        if (posts.isEmpty()) servStat.postValue(serverStatusChange("empty"))
-                        else servStat.postValue(serverStatusChange("OK"))
+                        if (posts.isEmpty()) servStat.postValue(serverStatusChange(ServerStatusFlag.EMPTY))
+                        else servStat.postValue(serverStatusChange(ServerStatusFlag.OK))
                     } catch (e: Exception) {
-                        servStat.postValue(serverStatusChange("error"))
+                        servStat.postValue(serverStatusChange(ServerStatusFlag.ERROR))
                     }
                 }
 
                 override fun onFailure(call: Call, e: IOException) {
-                    servStat.postValue(serverStatusChange("error"))
+                    servStat.postValue(serverStatusChange(ServerStatusFlag.ERROR))
                 }
             })
         return data
-    }
-
-    private fun serverStatusChange(status: String): FeedModel {
-        return when (status) {
-            "loading" -> FeedModel(loading = true)
-            "error" -> FeedModel(error = true)
-            "empty" -> FeedModel(empty = true)
-            "refreshing" -> FeedModel(refreshing = true)
-            else -> FeedModel()
-        }
     }
 
     fun getServerStatus() = servStat
@@ -207,11 +167,11 @@ class PostRepositoryInServer(context: Context) : PostRepository {
             client.newCall(dislike)
                 .enqueue(object : Callback {
                     override fun onFailure(call: Call, e: IOException) {
-                        servStat.postValue(serverStatusChange("error"))
+                        servStat.postValue(serverStatusChange(ServerStatusFlag.ERROR))
                     }
 
                     override fun onResponse(call: Call, response: Response) {
-                        servStat.postValue(serverStatusChange("OK"))
+                        servStat.postValue(serverStatusChange(ServerStatusFlag.OK))
                     }
 
                 })
@@ -224,11 +184,11 @@ class PostRepositoryInServer(context: Context) : PostRepository {
             client.newCall(like)
                 .enqueue(object : Callback {
                     override fun onFailure(call: Call, e: IOException) {
-                        servStat.postValue(serverStatusChange("error"))
+                        servStat.postValue(serverStatusChange(ServerStatusFlag.ERROR))
                     }
 
                     override fun onResponse(call: Call, response: Response) {
-                        servStat.postValue(serverStatusChange("OK"))
+                        servStat.postValue(serverStatusChange(ServerStatusFlag.OK))
                     }
                 })
         }
@@ -266,11 +226,11 @@ class PostRepositoryInServer(context: Context) : PostRepository {
         client.newCall(request)
             .enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
-                    servStat.postValue(serverStatusChange("error"))
+                    servStat.postValue(serverStatusChange(ServerStatusFlag.ERROR))
                 }
 
                 override fun onResponse(call: Call, response: Response) {
-                    servStat.postValue(serverStatusChange("OK"))
+                    servStat.postValue(serverStatusChange(ServerStatusFlag.OK))
                 }
             })
 
@@ -308,11 +268,11 @@ class PostRepositoryInServer(context: Context) : PostRepository {
         client.newCall(request)
             .enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
-                    servStat.postValue(serverStatusChange("error"))
+                    servStat.postValue(serverStatusChange(ServerStatusFlag.ERROR))
                 }
 
                 override fun onResponse(call: Call, response: Response) {
-                    servStat.postValue(serverStatusChange("OK"))
+                    servStat.postValue(serverStatusChange(ServerStatusFlag.OK))
                 }
             })
 
@@ -341,13 +301,13 @@ class PostRepositoryInServer(context: Context) : PostRepository {
             .build()
 
         client.newCall(request)
-            .enqueue(object : Callback{
+            .enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
-                    servStat.postValue(serverStatusChange("error"))
+                    servStat.postValue(serverStatusChange(ServerStatusFlag.ERROR))
                 }
 
                 override fun onResponse(call: Call, response: Response) {
-                    servStat.postValue(serverStatusChange("OK"))
+                    servStat.postValue(serverStatusChange(ServerStatusFlag.OK))
                 }
             })
 
