@@ -98,7 +98,11 @@ class PostRepositoryInServerWithRetrofit(context: Context) : PostRepository {
                         call: retrofit2.Call<Post>,
                         response: retrofit2.Response<Post>
                     ) {
-                        servStat.postValue(serverStatusChange(ServerStatusFlag.OK))
+                        if (response.isSuccessful) {
+                            servStat.postValue(serverStatusChange(ServerStatusFlag.OK))
+                        } else {
+                            servStat.postValue(serverStatusChange(ServerStatusFlag.ERROR))
+                        }
                     }
 
                     override fun onFailure(call: retrofit2.Call<Post>, e: Throwable) {
@@ -112,7 +116,11 @@ class PostRepositoryInServerWithRetrofit(context: Context) : PostRepository {
                         call: retrofit2.Call<Post>,
                         response: retrofit2.Response<Post>
                     ) {
-                        servStat.postValue(serverStatusChange(ServerStatusFlag.OK))
+                        if (response.isSuccessful) {
+                            servStat.postValue(serverStatusChange(ServerStatusFlag.OK))
+                        } else {
+                            servStat.postValue(serverStatusChange(ServerStatusFlag.ERROR))
+                        }
                     }
 
                     override fun onFailure(call: retrofit2.Call<Post>, e: Throwable) {
@@ -141,7 +149,11 @@ class PostRepositoryInServerWithRetrofit(context: Context) : PostRepository {
                     call: retrofit2.Call<Unit>,
                     response: retrofit2.Response<Unit>
                 ) {
-                    servStat.postValue(serverStatusChange(ServerStatusFlag.OK))
+                    if (response.isSuccessful) {
+                        servStat.postValue(serverStatusChange(ServerStatusFlag.OK))
+                    } else {
+                        servStat.postValue(serverStatusChange(ServerStatusFlag.ERROR))
+                    }
                 }
 
                 override fun onFailure(call: retrofit2.Call<Unit>, e: Throwable) {
@@ -164,7 +176,11 @@ class PostRepositoryInServerWithRetrofit(context: Context) : PostRepository {
                     call: retrofit2.Call<Post>,
                     response: retrofit2.Response<Post>
                 ) {
-                    servStat.postValue(serverStatusChange(ServerStatusFlag.OK))
+                    if (response.isSuccessful) {
+                        servStat.postValue(serverStatusChange(ServerStatusFlag.OK))
+                    } else {
+                        servStat.postValue(serverStatusChange(ServerStatusFlag.ERROR))
+                    }
                 }
 
                 override fun onFailure(call: retrofit2.Call<Post>, e: Throwable) {
@@ -192,7 +208,11 @@ class PostRepositoryInServerWithRetrofit(context: Context) : PostRepository {
                     call: retrofit2.Call<Post>,
                     response: retrofit2.Response<Post>
                 ) {
-                    servStat.postValue(serverStatusChange(ServerStatusFlag.OK))
+                    if (response.isSuccessful) {
+                        servStat.postValue(serverStatusChange(ServerStatusFlag.OK))
+                    } else {
+                        servStat.postValue(serverStatusChange(ServerStatusFlag.ERROR))
+                    }
                 }
 
                 override fun onFailure(call: retrofit2.Call<Post>, e: Throwable) {
