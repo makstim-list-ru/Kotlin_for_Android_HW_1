@@ -20,8 +20,14 @@ object NetologyUtilities {
         }
     }
 
+    fun nextPostIdCalc(posts: List<Post>): Long {
+        if (posts.isEmpty()) return 1L
+        if (posts.size == 1) return posts[0].id + 1L
+        return posts[0].id.coerceAtLeast(posts[posts.size-1].id) + 1L
+    }
+
     fun samplePosts(idStart: Long): List<Post> {
-        var id=idStart
+        var id = idStart
         val postsTests = listOf(
             Post(
                 id = id++,

@@ -8,15 +8,17 @@ import ru.netology.kotlin_for_android_hw_1.dto.Post
 import ru.netology.kotlin_for_android_hw_1.dto.postEmpty
 import ru.netology.kotlin_for_android_hw_1.model.FeedModel
 import ru.netology.kotlin_for_android_hw_1.repository.PostRepositoryInServer
+import ru.netology.kotlin_for_android_hw_1.repository.PostRepositoryInServerWithRetrofit
 
 class PostViewModel(application: Application) : AndroidViewModel(application) {
 
-    //    private val repository = PostRepositoryInMemory()
+//    private val repository = PostRepositoryInMemory()
 //    private val repository = PostRepositoryInFile(application)
 //    private val repository = PostRepositoryInSQL(application)
 //    private val repository = PostRepositoryInSQLwithRoom(application)
+//    private val repository = PostRepositoryInServer(application)
 
-    private val repository = PostRepositoryInServer(application)
+    private val repository = PostRepositoryInServerWithRetrofit(application)
 
     val dataServerStatus: LiveData<FeedModel> = repository.getServerStatus()
 
