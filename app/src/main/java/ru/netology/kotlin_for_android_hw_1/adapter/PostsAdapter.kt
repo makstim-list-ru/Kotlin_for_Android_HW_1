@@ -61,7 +61,7 @@ class PostViewHolder(
                 callback(post, "video")
             }
 
-            imageButtonHeart1.text = getFormatedNumber(post.likesNum)
+            imageButtonHeart1.text = getFormatedNumber(post.likes)
             imageButtonHeart1.isChecked = post.likedByMe
 
             imageButtonShare1.text = getFormatedNumber(post.sharesNum)

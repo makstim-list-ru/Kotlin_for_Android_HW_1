@@ -85,7 +85,7 @@ class PostRepositoryInServerWithRetrofit(context: Context) : PostRepository {
                 likedByMeFlag = it.likedByMe
                 it.copy(
                     likedByMe = !it.likedByMe,
-                    likesNum = if (it.likedByMe) it.likesNum - 1 else it.likesNum + 1
+                    likes = if (it.likedByMe) it.likes - 1 else it.likes + 1
                 )
             }
         }

@@ -39,7 +39,7 @@ data class PostEntity(
             post.published,
             post.content,
             post.likedByMe,
-            post.likesNum,
+            post.likes,
             post.sharesNum,
             post.seenNum,
             post.video

@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -26,7 +27,7 @@ class MainFragment : Fragment() {
         val viewModel by viewModels<PostViewModel>(ownerProducer = ::requireParentFragment)
 
         val adapter = PostsAdapter { post, key ->
-            if (key == "like") viewModel.likeViewModel(post.id)
+            if (key == "like") viewModel.likeVM(post.id)
             if (key == "share") {
                 val intent = Intent().apply {
                     putExtra(Intent.EXTRA_TEXT, post.content)
@@ -35,19 +36,19 @@ class MainFragment : Fragment() {
                 }
                 val shareIntent = Intent.createChooser(intent, "Sharing the post")
                 startActivity(shareIntent)
-                viewModel.shareViewModel(post.id)
+                viewModel.shareVM(post.id)
             }
             if (key == "video") {
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse(post.video))
                 startActivity(intent)
             }
-            if (key == "remove") viewModel.removeViewModel(post.id)
+            if (key == "remove") viewModel.removeVM(post.id)
             if (key == "edit") {
                 findNavController().navigate(R.id.action_mainFragment_to_editorFragment,
                     Bundle().apply { this.putString("TEXT_TRANSFER", post.content) })
-                viewModel.editViewModel(post)
+                viewModel.editVM(post)
             }
-            if (key == "cancel") viewModel.cancelViewModel()
+            if (key == "cancel") viewModel.cancelVM()
             if (key == "post") {
                 findNavController().navigate(R.id.action_mainFragment_to_focusFragment,
                     Bundle().apply { this.putString("TEXT_TRANSFER", post.id.toString()) })
@@ -57,11 +58,12 @@ class MainFragment : Fragment() {
 
         viewModel.data.observe(viewLifecycleOwner) { posts ->
             val newPostFlag = adapter.currentList.size < posts.size
-            adapter.submitList(posts)
-            if (newPostFlag) {
-                var position = adapter.currentList.size
-                if (position > 1) position--
-                binding.container.scrollToPosition(position)
+            adapter.submitList(posts) {
+                if (newPostFlag) {
+                    var position = adapter.currentList.size
+                    if (position > 1) position--
+                    binding.container.scrollToPosition(position)
+                }
             }
         }
 
@@ -69,6 +71,11 @@ class MainFragment : Fragment() {
             binding.progress.isVisible = state.loading
             binding.errorGroup.isVisible = state.error
             binding.emptyText.isVisible = state.empty
+            if (state.error) Toast.makeText(
+                activity,
+                "Error IO with the Server, please, try again!",
+                Toast.LENGTH_LONG
+            ).show()
         }
 
 
@@ -77,7 +84,7 @@ class MainFragment : Fragment() {
         }
 
         binding.retryButton.setOnClickListener {
-            viewModel.loadAllPostsViewModel()
+            viewModel.loadAllPostsVM()
         }
 
 

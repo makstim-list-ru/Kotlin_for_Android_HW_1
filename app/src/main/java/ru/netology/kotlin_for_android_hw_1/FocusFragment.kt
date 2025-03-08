@@ -39,7 +39,7 @@ class FocusFragment : Fragment() {
         with(binding.include) {
 
             imageButtonHeart1.setOnClickListener {
-                viewModel.likeViewModel(post.id)
+                viewModel.likeVM(post.id)
 //                posts = viewModel.data.value ?: return@setOnClickListener
 //                post = posts.filter { it.id == postID }[0]
 //                onBindPost(post, binding)
@@ -53,7 +53,7 @@ class FocusFragment : Fragment() {
                 }
                 val shareIntent = Intent.createChooser(intent, "Sharing the post")
                 startActivity(shareIntent)
-                viewModel.shareViewModel(post.id)
+                viewModel.shareVM(post.id)
 //                posts = viewModel.data.value ?: return@setOnClickListener
 //                post = posts.filter { it.id == postID }[0]
 //                onBindPost(post, binding)
@@ -65,7 +65,7 @@ class FocusFragment : Fragment() {
                 pum.setOnMenuItemClickListener {
                     when (it.itemId) {
                         R.id.remove -> {
-                            viewModel.removeViewModel(post.id)
+                            viewModel.removeVM(post.id)
                             findNavController().navigateUp()
                             true
                         }
@@ -73,7 +73,7 @@ class FocusFragment : Fragment() {
                         R.id.edit -> {
                             findNavController().navigate(R.id.action_focusFragment_to_editorFragment,
                                 Bundle().apply { this.putString("TEXT_TRANSFER", post.content) })
-                            viewModel.editViewModel(post)
+                            viewModel.editVM(post)
                             true
                         }
 
@@ -123,7 +123,7 @@ class FocusFragment : Fragment() {
                 startActivity(intent)
             }
 
-            imageButtonHeart1.text = getFormatedNumber(post.likesNum)
+            imageButtonHeart1.text = getFormatedNumber(post.likes)
             imageButtonHeart1.isChecked = post.likedByMe
 
             imageButtonShare1.text = getFormatedNumber(post.sharesNum)

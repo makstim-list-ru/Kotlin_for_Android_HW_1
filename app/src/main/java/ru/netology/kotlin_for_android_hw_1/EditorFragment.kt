@@ -28,9 +28,9 @@ class EditorFragment : Fragment() {
         binding.ok.setOnClickListener {
             val text = binding.content2.text.toString()
             if (text.isNotBlank()) {
-                viewModel.saveViewModel(text)
+                viewModel.saveVM(text)
             } else {
-                viewModel.cancelViewModel()
+                viewModel.cancelVM()
             }
             findNavController().navigateUp()
         }

@@ -138,7 +138,7 @@ class PostRepositoryInSQL(context: Context) : PostRepository {
                 content = getString(getColumnIndexOrThrow(PostColumns.COLUMN_CONTENT)),
                 published = getString(getColumnIndexOrThrow(PostColumns.COLUMN_PUBLISHED)),
                 likedByMe = getInt(getColumnIndexOrThrow(PostColumns.COLUMN_LIKED_BY_ME)) != 0,
-                likesNum = getLong(getColumnIndexOrThrow(PostColumns.COLUMN_LIKES)),
+                likes = getLong(getColumnIndexOrThrow(PostColumns.COLUMN_LIKES)),
                 sharesNum = getLong(getColumnIndexOrThrow(PostColumns.COLUMN_SHARES)),
                 seenNum = getLong(getColumnIndexOrThrow(PostColumns.COLUMN_SEEN)),
                 video = getString(getColumnIndexOrThrow(PostColumns.COLUMN_VIDEO))
@@ -183,7 +183,7 @@ class PostRepositoryInSQL(context: Context) : PostRepository {
         posts = posts?.map {
             if (it.id != id) it else it.copy(
                 likedByMe = !it.likedByMe,
-                likesNum = if (it.likedByMe) it.likesNum - 1 else it.likesNum + 1
+                likes = if (it.likedByMe) it.likes - 1 else it.likes + 1
             )
         }
         data.value = posts
