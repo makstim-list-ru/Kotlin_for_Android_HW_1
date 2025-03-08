@@ -2,7 +2,6 @@ package ru.netology.kotlin_for_android_hw_1.roomdb
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import ru.netology.kotlin_for_android_hw_1.dao.PostDao
 import ru.netology.kotlin_for_android_hw_1.dao.PostDaoSuspend
 import ru.netology.kotlin_for_android_hw_1.entity.PostEntity
 

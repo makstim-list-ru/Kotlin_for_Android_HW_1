@@ -52,7 +52,11 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
         try {
             val response = PostsRetrofitSuspend.retrofitService.getAll()
             val posts = retrofitErrorHandler(response) ?: return data
+
             dao.insert(posts.map { PostEntity.fromPostToEntity(it) })
+
+            val postsToDelete = data.value?.filter { !posts.contains(it) }
+            postsToDelete?.forEach { dao.removeByID(it.id) }
 
             if (posts.isEmpty()) servStat.postValue(serverStatusChange(ServerStatusFlag.EMPTY))
             else servStat.postValue(serverStatusChange(ServerStatusFlag.OK))

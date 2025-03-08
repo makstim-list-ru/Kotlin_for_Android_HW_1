@@ -55,6 +55,7 @@ dependencies {
     implementation(libs.glide)
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
+    implementation(libs.androidx.swiperefreshlayout)
     kapt("androidx.room:room-compiler:2.6.1")
 
     // define a BOM and its version

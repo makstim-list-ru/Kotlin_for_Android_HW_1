@@ -16,7 +16,7 @@ class EditorFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         val binding = FragmentEditorBinding.inflate(inflater, container, false)
 
         val viewModel by viewModels<PostViewModel>(ownerProducer = ::requireParentFragment)

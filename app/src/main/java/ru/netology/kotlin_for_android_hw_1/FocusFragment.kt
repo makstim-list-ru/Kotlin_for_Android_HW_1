@@ -22,7 +22,7 @@ class FocusFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         val binding = FragmentFocusBinding.inflate(inflater, container, false)
 

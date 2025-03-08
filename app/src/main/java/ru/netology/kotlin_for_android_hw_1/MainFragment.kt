@@ -20,7 +20,7 @@ class MainFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         val binding = FragmentMainBinding.inflate(inflater, container, false)
 
 
@@ -71,6 +71,7 @@ class MainFragment : Fragment() {
             binding.progress.isVisible = state.loading
             binding.errorGroup.isVisible = state.error
             binding.emptyText.isVisible = state.empty
+            binding.swipeRefresh.isRefreshing = state.refreshing
             if (state.error) Toast.makeText(
                 activity,
                 "Error IO with the Server, please, try again!",
@@ -84,6 +85,10 @@ class MainFragment : Fragment() {
         }
 
         binding.retryButton.setOnClickListener {
+            viewModel.loadAllPostsVM()
+        }
+
+        binding.swipeRefresh.setOnRefreshListener {
             viewModel.loadAllPostsVM()
         }
 
