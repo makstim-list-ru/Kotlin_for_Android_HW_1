@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import ru.netology.kotlin_for_android_hw_1.dto.Post
 
 interface PostRepositorySuspend {
-    fun getPostsAll(): LiveData<List<Post>>
+//    fun getPostsAll(): LiveData<List<Post>>
     suspend fun likeByID(id: Long)
     suspend fun shareByID(id: Long)
     suspend fun removeByID(id: Long)

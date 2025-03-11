@@ -79,6 +79,10 @@ class MainFragment : Fragment() {
             ).show()
         }
 
+        viewModel.newerCount.observe(viewLifecycleOwner) {
+            println(it)
+            binding.newerPostsButton.isVisible = it > 0
+        }
 
         binding.plusButton.setOnClickListener {
             findNavController().navigate(R.id.action_mainFragment_to_editorFragment)
@@ -92,6 +96,10 @@ class MainFragment : Fragment() {
             viewModel.loadAllPostsVM()
         }
 
+        binding.newerPostsButton.setOnClickListener {
+            binding.newerPostsButton.isVisible = false
+            viewModel.loadNewerVM()
+        }
 
         return binding.root
     }

@@ -3,8 +3,15 @@ package ru.netology.kotlin_for_android_hw_1.repository
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.map
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.switchMap
 import androidx.room.Room
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import retrofit2.Response
 import ru.netology.kotlin_for_android_hw_1.dto.Post
 import ru.netology.kotlin_for_android_hw_1.entity.PostEntity
@@ -14,16 +21,16 @@ import ru.netology.kotlin_for_android_hw_1.roomdb.RoomDBSuspend
 
 class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
 
-    private enum class ServerStatusFlag {
+    private enum class ServerStatus {
         LOADING, ERROR, EMPTY, REFRESHING, OK
     }
 
-    private fun serverStatusChange(status: ServerStatusFlag): FeedModel {
+    private fun serverStatus(status: ServerStatus): FeedModel {
         return when (status) {
-            ServerStatusFlag.LOADING -> FeedModel(loading = true)
-            ServerStatusFlag.ERROR -> FeedModel(error = true)
-            ServerStatusFlag.EMPTY -> FeedModel(empty = true)
-            ServerStatusFlag.REFRESHING -> FeedModel(refreshing = true)
+            ServerStatus.LOADING -> FeedModel(loading = true)
+            ServerStatus.ERROR -> FeedModel(error = true)
+            ServerStatus.EMPTY -> FeedModel(empty = true)
+            ServerStatus.REFRESHING -> FeedModel(refreshing = true)
             else -> FeedModel()
         }
     }
@@ -35,37 +42,48 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
 
     private val dao = db.getPostDao()
 
-    private val data = dao.getPostsAll().map { it -> it.map { it.toPostFromEntity() } }
-    fun getData() = data
+    private val dataFlow = dao.getPostsAll().map { it -> it.map { it.toPostFromEntity() } }
+    private val dataLive: LiveData<List<Post>> = dataFlow.asLiveData(Dispatchers.Default)
+    fun getData() = dataLive
 
-    private val servStat = MutableLiveData(FeedModel())
-    fun getServerStatus() = servStat
+    @Volatile
+    private var flagLoad = false
 
-    override fun getPostsAll(): LiveData<List<Post>> {
-        //TODO - deleted - obsolete function
-        return data
+    private val newerCountLive = dataLive.switchMap {
+        getPostsNewer(maxOf(it.lastOrNull()?.id ?: 0, it.firstOrNull()?.id ?: 0))
+            .asLiveData(Dispatchers.Default)
     }
 
-    suspend fun getPostsAllAsync(): LiveData<List<Post>> {
+    fun getNewerCount() = let {
+        newerCountLive
+    }
 
-        servStat.value = serverStatusChange(ServerStatusFlag.LOADING)
+    private val servStat = MutableLiveData(FeedModel())
+    fun getServStat() = servStat
+
+    suspend fun getPostsAllAsync(): Flow<List<Post>> {
+
+        servStat.value = serverStatus(ServerStatus.LOADING)
         try {
             val response = PostsRetrofitSuspend.retrofitService.getAll()
-            val posts = retrofitErrorHandler(response) ?: return data
+            val posts = retrofitErrorHandler(response) ?: return dataFlow
 
             dao.insert(posts.map { PostEntity.fromPostToEntity(it) })
 
-            val postsToDelete = data.value?.filter { !posts.contains(it) }
+//            val postsToDelete = data.value?.filter { !posts.contains(it) }
+//            postsToDelete?.forEach { dao.removeByID(it.id) }
+
+            val postsToDelete = dataLive.value?.filter { !posts.contains(it) }
             postsToDelete?.forEach { dao.removeByID(it.id) }
 
-            if (posts.isEmpty()) servStat.postValue(serverStatusChange(ServerStatusFlag.EMPTY))
-            else servStat.postValue(serverStatusChange(ServerStatusFlag.OK))
+            if (posts.isEmpty()) servStat.postValue(serverStatus(ServerStatus.EMPTY))
+            else servStat.postValue(serverStatus(ServerStatus.OK))
 
-            return data
+            return dataFlow
         } catch (e: Exception) {
-            servStat.postValue(serverStatusChange(ServerStatusFlag.ERROR))
+            servStat.postValue(serverStatus(ServerStatus.ERROR))
         }
-        return data
+        return dataFlow
     }
 
     override suspend fun shareByID(id: Long) = dao.shareByID(id)
@@ -75,7 +93,7 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
         try {
             PostsRetrofitSuspend.retrofitService.removeById(id)
         } catch (e: Exception) {
-            servStat.postValue(serverStatusChange(ServerStatusFlag.ERROR))
+            servStat.postValue(serverStatus(ServerStatus.ERROR))
         }
     }
 
@@ -85,7 +103,7 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
         try {
             PostsRetrofitSuspend.retrofitService.save(post)
         } catch (e: Exception) {
-            servStat.postValue(serverStatusChange(ServerStatusFlag.ERROR))
+            servStat.postValue(serverStatus(ServerStatus.ERROR))
         }
     }
 
@@ -107,7 +125,7 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
         try {
             PostsRetrofitSuspend.retrofitService.save(myPost)
         } catch (e: Exception) {
-            servStat.postValue(serverStatusChange(ServerStatusFlag.ERROR))
+            servStat.postValue(serverStatus(ServerStatus.ERROR))
         }
     }
 
@@ -119,19 +137,62 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
             if (post.likedByMe) PostsRetrofitSuspend.retrofitService.likeById(id)
             else PostsRetrofitSuspend.retrofitService.dislikeById(id)
         } catch (e: Exception) {
-            servStat.postValue(serverStatusChange(ServerStatusFlag.ERROR))
+            servStat.postValue(serverStatus(ServerStatus.ERROR))
         }
     }
 
     private fun <T> retrofitErrorHandler(res: Response<T>): T? {
         if (res.isSuccessful) {
-            servStat.postValue(serverStatusChange(ServerStatusFlag.OK))
+            servStat.postValue(serverStatus(ServerStatus.OK))
             return res.body()
         } else {
-            servStat.postValue(serverStatusChange(ServerStatusFlag.ERROR))
+            servStat.postValue(serverStatus(ServerStatus.ERROR))
         }
         return null
     }
 
+    private fun getPostsNewer(id: Long): Flow<Int> = flow {
+        while (true) {
+//            if (!flagLoad)
+                delay(10_000)
+            val response = PostsRetrofitSuspend.retrofitService.getPostsNewer(id)
+            if (response.isSuccessful) {
+                servStat.postValue(serverStatus(ServerStatus.OK))
+                val posts = response.body()
+                if (!posts.isNullOrEmpty()) {
+                    if (flagLoad) {
+                        println("flagLoad is ON")
+//                        dao.insert(posts.map { PostEntity.fromPostToEntity(it) })
+//                        flagLoad = false
+                    } else {
+                        emit(posts.size)
+                    }
+                } else
+                    emit(0)
+            } else servStat.postValue(serverStatus(ServerStatus.ERROR))
+        }
+    }.catch {
+        servStat.postValue(serverStatus(ServerStatus.ERROR))
+    }
+
+    suspend fun loadNewer() {
+        println("button pressed")
+        flagLoad = true
+
+        val response = PostsRetrofitSuspend.retrofitService.getPostsNewer(
+            maxOf(
+                dataLive.value?.lastOrNull()?.id ?: 0,
+                dataLive.value?.firstOrNull()?.id ?: 0
+            )
+        )
+        if (response.isSuccessful) {
+            servStat.postValue(serverStatus(ServerStatus.OK))
+            val posts = response.body()
+            if (!posts.isNullOrEmpty()) {
+                dao.insert(posts.map { PostEntity.fromPostToEntity(it) })
+                flagLoad = false
+            } else servStat.postValue(serverStatus(ServerStatus.ERROR))
+        } else servStat.postValue(serverStatus(ServerStatus.ERROR))
+    }
 }
 

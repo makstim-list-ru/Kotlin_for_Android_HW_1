@@ -22,11 +22,13 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = PostRepositoryInServerAndSQL(application)
 
-    val dataServerStatus: LiveData<FeedModel> = repository.getServerStatus()
+    val dataServerStatus: LiveData<FeedModel> = repository.getServStat()
+//    val newerFound = repository.getFlagNewer()
 
-//    val data = repository.getPostsAll()
+    //    val data = repository.getPostsAll()
 //    val data = repository.getPostsAllAsync()
-    val data = repository.getData()
+    val data: LiveData<List<Post>> = repository.getData()
+    val newerCount: LiveData<Int> = repository.getNewerCount()
 
     init {
         viewModelScope.launch {
@@ -34,9 +36,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-
     private val editedPostTmp = MutableLiveData(postEmpty)
-
 
     fun likeVM(id: Long) {
         viewModelScope.launch { repository.likeByID(id) }
@@ -74,5 +74,9 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
     fun loadAllPostsVM() {
         viewModelScope.launch { repository.getPostsAllAsync() }
+    }
+
+    fun loadNewerVM() {
+        viewModelScope.launch { repository.loadNewer() }
     }
 }

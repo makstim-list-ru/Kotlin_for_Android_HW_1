@@ -30,6 +30,9 @@ interface PostsRetrofitSuspendInterface {
 
     @DELETE("posts/{id}/likes")
     suspend fun dislikeById(@Path("id") id: Long): Post
+
+    @GET("posts/{id}/newer")
+    suspend fun getPostsNewer(@Path("id") id: Long): Response<List<Post>>
 }
 
 object PostsRetrofitSuspend {
