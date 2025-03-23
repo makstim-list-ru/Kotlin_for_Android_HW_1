@@ -44,7 +44,11 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
 
     private val dataFlow = dao.getPostsAll().map { it -> it.map { it.toPostFromEntity() } }
     private val dataLive: LiveData<List<Post>> = dataFlow.asLiveData(Dispatchers.Default)
-    fun getData() = dataLive
+    override fun getData(): LiveData<List<Post>> {
+//        if (dataLive.value.isNullOrEmpty()) servStat.postValue(serverStatus(ServerStatus.EMPTY))
+//        else servStat.postValue(serverStatus(ServerStatus.OK))
+        return dataLive
+    }
 
     @Volatile
     private var flagLoad = false
@@ -54,27 +58,28 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
             .asLiveData(Dispatchers.Default)
     }
 
-    fun getNewerCount() = let {
-        newerCountLive
-    }
+    override fun getNewerCount() = newerCountLive
 
     private val servStat = MutableLiveData(FeedModel())
-    fun getServStat() = servStat
+    override fun getServStat(): LiveData<FeedModel> = servStat
 
-    suspend fun getPostsAllAsync(): Flow<List<Post>> {
-
+    override suspend fun getPostsAllAsync(): Flow<List<Post>> {
         servStat.value = serverStatus(ServerStatus.LOADING)
         try {
             val response = PostsRetrofitSuspend.retrofitService.getAll()
             val posts = retrofitErrorHandler(response) ?: return dataFlow
 
+
             dao.insert(posts.map { PostEntity.fromPostToEntity(it) })
+
 
 //            val postsToDelete = data.value?.filter { !posts.contains(it) }
 //            postsToDelete?.forEach { dao.removeByID(it.id) }
 
+            delay(2_000)
             val postsToDelete = dataLive.value?.filter { !posts.contains(it) }
             postsToDelete?.forEach { dao.removeByID(it.id) }
+
 
             if (posts.isEmpty()) servStat.postValue(serverStatus(ServerStatus.EMPTY))
             else servStat.postValue(serverStatus(ServerStatus.OK))
@@ -121,7 +126,6 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
                 )
             )
         )
-
         try {
             PostsRetrofitSuspend.retrofitService.save(myPost)
         } catch (e: Exception) {
@@ -141,20 +145,31 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
         }
     }
 
-    private fun <T> retrofitErrorHandler(res: Response<T>): T? {
-        if (res.isSuccessful) {
+    override suspend fun loadNewer() {
+        println("button pressed")
+        flagLoad = true
+
+        val response = PostsRetrofitSuspend.retrofitService.getPostsNewer(
+            maxOf(
+                dataLive.value?.lastOrNull()?.id ?: 0,
+                dataLive.value?.firstOrNull()?.id ?: 0
+            )
+        )
+        if (response.isSuccessful) {
             servStat.postValue(serverStatus(ServerStatus.OK))
-            return res.body()
-        } else {
-            servStat.postValue(serverStatus(ServerStatus.ERROR))
-        }
-        return null
+            val posts = response.body()
+            if (!posts.isNullOrEmpty()) {
+                dao.insert(posts.map { PostEntity.fromPostToEntity(it) })
+//                flagLoad = false
+            } else servStat.postValue(serverStatus(ServerStatus.ERROR))
+        } else servStat.postValue(serverStatus(ServerStatus.ERROR))
+        flagLoad = false
     }
 
     private fun getPostsNewer(id: Long): Flow<Int> = flow {
         while (true) {
 //            if (!flagLoad)
-                delay(10_000)
+            delay(10_000)
             val response = PostsRetrofitSuspend.retrofitService.getPostsNewer(id)
             if (response.isSuccessful) {
                 servStat.postValue(serverStatus(ServerStatus.OK))
@@ -175,24 +190,15 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
         servStat.postValue(serverStatus(ServerStatus.ERROR))
     }
 
-    suspend fun loadNewer() {
-        println("button pressed")
-        flagLoad = true
-
-        val response = PostsRetrofitSuspend.retrofitService.getPostsNewer(
-            maxOf(
-                dataLive.value?.lastOrNull()?.id ?: 0,
-                dataLive.value?.firstOrNull()?.id ?: 0
-            )
-        )
-        if (response.isSuccessful) {
+    private fun <T> retrofitErrorHandler(res: Response<T>): T? {
+        if (res.isSuccessful) {
             servStat.postValue(serverStatus(ServerStatus.OK))
-            val posts = response.body()
-            if (!posts.isNullOrEmpty()) {
-                dao.insert(posts.map { PostEntity.fromPostToEntity(it) })
-                flagLoad = false
-            } else servStat.postValue(serverStatus(ServerStatus.ERROR))
-        } else servStat.postValue(serverStatus(ServerStatus.ERROR))
+            return res.body()
+        } else {
+            servStat.postValue(serverStatus(ServerStatus.ERROR))
+        }
+        return null
     }
+
 }
 

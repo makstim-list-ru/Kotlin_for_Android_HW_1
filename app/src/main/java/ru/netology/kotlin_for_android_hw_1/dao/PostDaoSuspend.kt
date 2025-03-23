@@ -44,6 +44,9 @@ interface PostDaoSuspend {
     @Query("DELETE FROM PostEntity WHERE id = :id")
     suspend fun removeByID(id: Long)
 
+    @Query("DELETE FROM PostEntity")
+    suspend fun removeAll()
+
     suspend fun save(post: PostEntity) {
         insert(post)
     }

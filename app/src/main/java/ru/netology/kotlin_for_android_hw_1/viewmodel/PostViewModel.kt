@@ -10,6 +10,7 @@ import ru.netology.kotlin_for_android_hw_1.dto.Post
 import ru.netology.kotlin_for_android_hw_1.dto.postEmpty
 import ru.netology.kotlin_for_android_hw_1.model.FeedModel
 import ru.netology.kotlin_for_android_hw_1.repository.PostRepositoryInServerAndSQL
+import ru.netology.kotlin_for_android_hw_1.repository.PostRepositorySuspend
 
 class PostViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -20,7 +21,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 //    private val repository = PostRepositoryInServer(application)
 //    private val repository = PostRepositoryInServerWithRetrofit(application)
 
-    private val repository = PostRepositoryInServerAndSQL(application)
+    private val repository : PostRepositorySuspend = PostRepositoryInServerAndSQL(application)
 
     val dataServerStatus: LiveData<FeedModel> = repository.getServStat()
 //    val newerFound = repository.getFlagNewer()
