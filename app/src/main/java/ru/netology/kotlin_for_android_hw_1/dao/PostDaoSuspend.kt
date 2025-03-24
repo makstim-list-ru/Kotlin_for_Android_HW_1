@@ -11,6 +11,7 @@ import ru.netology.kotlin_for_android_hw_1.entity.PostEntity
 
 @Dao
 interface PostDaoSuspend {
+    //@Query("SELECT * FROM PostEntity ORDER BY CASE WHEN id >= 0 THEN 0 ELSE 1 END ASC, ABS(id) ASC")
     @Query("SELECT * FROM PostEntity ORDER BY id ASC")
     fun getPostsAll(): Flow<List<PostEntity>>
 
@@ -45,7 +46,7 @@ interface PostDaoSuspend {
     @Query("DELETE FROM PostEntity WHERE id = :id")
     suspend fun removeByID(id: Long)
 
-    @Query("DELETE FROM PostEntity")
+    @Query("DELETE FROM PostEntity WHERE id > 0")
     suspend fun removeAll()
 
     suspend fun save(post: PostEntity) {
@@ -67,5 +68,11 @@ interface PostDaoSuspend {
         removeAll()
         insert(posts)
     }
+
+    @Query("SELECT MIN(id) FROM PostEntity")
+    suspend fun getMinId(): Long?
+
+    @Query("SELECT * FROM PostEntity WHERE id < 0 ORDER BY id ASC")
+    suspend fun getUnsaved(): List<PostEntity>
 
 }

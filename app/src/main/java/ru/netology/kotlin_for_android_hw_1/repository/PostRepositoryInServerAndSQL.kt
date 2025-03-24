@@ -12,6 +12,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 import retrofit2.Response
 import ru.netology.kotlin_for_android_hw_1.dto.Post
 import ru.netology.kotlin_for_android_hw_1.entity.PostEntity
@@ -44,6 +46,13 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
 
     override suspend fun getPostsAllAsync() {
         servStat.value = serverStatus(ServerStatus.LOADING)
+
+        try {
+            supervisorScope {
+                dao.getUnsaved().forEach { launch { save(it.toPostFromEntity()) } }
+            }
+        } finally { println("dao.getUnsaved().forEach FAULT")}
+
         try {
             val response = PostsRetrofitSuspend.retrofitService.getAll()
             val posts = retrofitErrorHandler(response) ?: return
@@ -85,20 +94,26 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
 
     override suspend fun save(post: Post) {
 
-        val myPost = post.copy(author = "Me", authorAvatar = "sber.jpg")
+        if (post.id > 0) throw Exception("ERROR in fun SAVE, calls with zero id or less are allowed only")
 
-        dao.save(
+        val myPost = post.copy(id = 0L, author = "Me", authorAvatar = "sber.jpg")
+        val tempId = if (post.id == 0L) dao.getMinId()?.coerceAtMost(0)?.dec() ?: -1 else post.id
+
+        if (post.id == 0L) dao.save(    // если сохраняется свежий пост с присвоением нового (-)id в ЛБД
             PostEntity.fromPostToEntity(
                 post.copy(
+                    id = tempId,
                     author = "Me",
-                    published = "Now",
                     content = post.content,
                     authorAvatar = "sber.jpg"
                 )
             )
         )
+
         try {
-            PostsRetrofitSuspend.retrofitService.save(myPost)
+            val serverPost = PostsRetrofitSuspend.retrofitService.save(myPost)
+            dao.save(PostEntity.fromPostToEntity(serverPost))
+            dao.removeByID(tempId)
         } catch (e: Exception) {
             servStat.postValue(serverStatus(ServerStatus.ERROR))
         }
@@ -112,6 +127,7 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
             if (post.likedByMe) PostsRetrofitSuspend.retrofitService.likeById(id)
             else PostsRetrofitSuspend.retrofitService.dislikeById(id)
         } catch (e: Exception) {
+            dao.likeByID(id)
             servStat.postValue(serverStatus(ServerStatus.ERROR))
         }
     }
