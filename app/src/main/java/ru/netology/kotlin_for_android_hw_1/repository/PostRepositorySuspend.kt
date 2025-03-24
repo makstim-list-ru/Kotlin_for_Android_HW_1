@@ -12,7 +12,7 @@ interface PostRepositorySuspend {
     suspend fun removeByID(id: Long)
     suspend fun save(post: Post)
     suspend fun edit(post: Post)
-    suspend fun getPostsAllAsync(): Flow<List<Post>>
+    suspend fun getPostsAllAsync()
     suspend fun loadNewer()
     fun getServStat(): LiveData<FeedModel>
     fun getData(): LiveData<List<Post>>

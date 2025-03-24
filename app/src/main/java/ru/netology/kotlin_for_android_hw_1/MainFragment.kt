@@ -23,7 +23,6 @@ class MainFragment : Fragment() {
     ): View {
         val binding = FragmentMainBinding.inflate(inflater, container, false)
 
-
         val viewModel by viewModels<PostViewModel>(ownerProducer = ::requireParentFragment)
 
         val adapter = PostsAdapter { post, key ->
@@ -57,6 +56,7 @@ class MainFragment : Fragment() {
         binding.container.adapter = adapter
 
         viewModel.data.observe(viewLifecycleOwner) { posts ->
+            binding.emptyText.isVisible = posts.isNullOrEmpty()
             val newPostFlag = adapter.currentList.size < posts.size
             adapter.submitList(posts) {
                 if (newPostFlag) {

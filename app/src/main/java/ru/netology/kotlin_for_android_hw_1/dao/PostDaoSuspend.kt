@@ -5,6 +5,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import kotlinx.coroutines.flow.Flow
 import ru.netology.kotlin_for_android_hw_1.entity.PostEntity
 
@@ -60,5 +61,11 @@ interface PostDaoSuspend {
 
     @Query("SELECT EXISTS(SELECT 1 FROM PostEntity)")
     suspend fun hasTable(): Boolean
+
+    @Transaction
+    suspend fun deleteAndInsert(posts: List<PostEntity>) {
+        removeAll()
+        insert(posts)
+    }
 
 }

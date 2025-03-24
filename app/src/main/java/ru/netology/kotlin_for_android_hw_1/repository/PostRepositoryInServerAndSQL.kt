@@ -21,74 +21,45 @@ import ru.netology.kotlin_for_android_hw_1.roomdb.RoomDBSuspend
 
 class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
 
-    private enum class ServerStatus {
-        LOADING, ERROR, EMPTY, REFRESHING, OK
-    }
 
-    private fun serverStatus(status: ServerStatus): FeedModel {
-        return when (status) {
-            ServerStatus.LOADING -> FeedModel(loading = true)
-            ServerStatus.ERROR -> FeedModel(error = true)
-            ServerStatus.EMPTY -> FeedModel(empty = true)
-            ServerStatus.REFRESHING -> FeedModel(refreshing = true)
-            else -> FeedModel()
-        }
-    }
-
+    private val servStat = MutableLiveData(FeedModel())
     private val db =
         Room.databaseBuilder(context, RoomDBSuspend::class.java, "database.db")
 //            .allowMainThreadQueries()
             .build()
-
     private val dao = db.getPostDao()
-
     private val dataFlow = dao.getPostsAll().map { it -> it.map { it.toPostFromEntity() } }
     private val dataLive: LiveData<List<Post>> = dataFlow.asLiveData(Dispatchers.Default)
-    override fun getData(): LiveData<List<Post>> {
-//        if (dataLive.value.isNullOrEmpty()) servStat.postValue(serverStatus(ServerStatus.EMPTY))
-//        else servStat.postValue(serverStatus(ServerStatus.OK))
-        return dataLive
-    }
-
-    @Volatile
-    private var flagLoad = false
-
     private val newerCountLive = dataLive.switchMap {
         getPostsNewer(maxOf(it.lastOrNull()?.id ?: 0, it.firstOrNull()?.id ?: 0))
             .asLiveData(Dispatchers.Default)
     }
 
+    @Volatile
+    private var flagLoad = false
+
+    override fun getServStat(): LiveData<FeedModel> = servStat
+    override fun getData(): LiveData<List<Post>> = dataLive
     override fun getNewerCount() = newerCountLive
 
-    private val servStat = MutableLiveData(FeedModel())
-    override fun getServStat(): LiveData<FeedModel> = servStat
-
-    override suspend fun getPostsAllAsync(): Flow<List<Post>> {
+    override suspend fun getPostsAllAsync() {
         servStat.value = serverStatus(ServerStatus.LOADING)
         try {
             val response = PostsRetrofitSuspend.retrofitService.getAll()
-            val posts = retrofitErrorHandler(response) ?: return dataFlow
+            val posts = retrofitErrorHandler(response) ?: return
 
+            dao.deleteAndInsert(posts.map { PostEntity.fromPostToEntity(it) })
 
-            dao.insert(posts.map { PostEntity.fromPostToEntity(it) })
-
-
-//            val postsToDelete = data.value?.filter { !posts.contains(it) }
+//            dao.insert(posts.map { PostEntity.fromPostToEntity(it) })
+//            delay(2_000)
+//            val postsToDelete = dataLive.value?.filter { !posts.contains(it) }
 //            postsToDelete?.forEach { dao.removeByID(it.id) }
-
-            delay(2_000)
-            val postsToDelete = dataLive.value?.filter { !posts.contains(it) }
-            postsToDelete?.forEach { dao.removeByID(it.id) }
-
 
             if (posts.isEmpty()) servStat.postValue(serverStatus(ServerStatus.EMPTY))
             else servStat.postValue(serverStatus(ServerStatus.OK))
-
-            return dataFlow
         } catch (e: Exception) {
             servStat.postValue(serverStatus(ServerStatus.ERROR))
         }
-        return dataFlow
     }
 
     override suspend fun shareByID(id: Long) = dao.shareByID(id)
@@ -149,26 +120,30 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
         println("button pressed")
         flagLoad = true
 
-        val response = PostsRetrofitSuspend.retrofitService.getPostsNewer(
-            maxOf(
-                dataLive.value?.lastOrNull()?.id ?: 0,
-                dataLive.value?.firstOrNull()?.id ?: 0
+        try {
+            val response = PostsRetrofitSuspend.retrofitService.getPostsNewer(
+                maxOf(
+                    dataLive.value?.lastOrNull()?.id ?: 0,
+                    dataLive.value?.firstOrNull()?.id ?: 0
+                )
             )
-        )
-        if (response.isSuccessful) {
-            servStat.postValue(serverStatus(ServerStatus.OK))
-            val posts = response.body()
-            if (!posts.isNullOrEmpty()) {
-                dao.insert(posts.map { PostEntity.fromPostToEntity(it) })
+            if (response.isSuccessful) {
+                servStat.postValue(serverStatus(ServerStatus.OK))
+                val posts = response.body()
+                if (!posts.isNullOrEmpty()) {
+                    dao.insert(posts.map { PostEntity.fromPostToEntity(it) })
 //                flagLoad = false
+                } else servStat.postValue(serverStatus(ServerStatus.ERROR))
             } else servStat.postValue(serverStatus(ServerStatus.ERROR))
-        } else servStat.postValue(serverStatus(ServerStatus.ERROR))
+        } catch (e: Exception) {
+            servStat.postValue(serverStatus(ServerStatus.ERROR))
+        }
+
         flagLoad = false
     }
 
     private fun getPostsNewer(id: Long): Flow<Int> = flow {
         while (true) {
-//            if (!flagLoad)
             delay(10_000)
             val response = PostsRetrofitSuspend.retrofitService.getPostsNewer(id)
             if (response.isSuccessful) {
@@ -177,8 +152,6 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
                 if (!posts.isNullOrEmpty()) {
                     if (flagLoad) {
                         println("flagLoad is ON")
-//                        dao.insert(posts.map { PostEntity.fromPostToEntity(it) })
-//                        flagLoad = false
                     } else {
                         emit(posts.size)
                     }
@@ -198,6 +171,20 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
             servStat.postValue(serverStatus(ServerStatus.ERROR))
         }
         return null
+    }
+
+    private fun serverStatus(status: ServerStatus): FeedModel {
+        return when (status) {
+            ServerStatus.LOADING -> FeedModel(loading = true)
+            ServerStatus.ERROR -> FeedModel(error = true)
+            ServerStatus.EMPTY -> FeedModel(empty = true)
+            ServerStatus.REFRESHING -> FeedModel(refreshing = true)
+            else -> FeedModel()
+        }
+    }
+
+    private enum class ServerStatus {
+        LOADING, ERROR, EMPTY, REFRESHING, OK
     }
 
 }
