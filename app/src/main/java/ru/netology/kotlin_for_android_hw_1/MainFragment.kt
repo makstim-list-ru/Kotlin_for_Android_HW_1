@@ -89,6 +89,7 @@ class MainFragment : Fragment() {
         }
 
         binding.retryButton.setOnClickListener {
+            println("Button <retry> pressed")
             viewModel.loadAllPostsVM()
         }
 

@@ -24,10 +24,6 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     private val repository : PostRepositorySuspend = PostRepositoryInServerAndSQL(application)
 
     val dataServerStatus: LiveData<FeedModel> = repository.getServStat()
-//    val newerFound = repository.getFlagNewer()
-
-    //    val data = repository.getPostsAll()
-//    val data = repository.getPostsAllAsync()
     val data: LiveData<List<Post>> = repository.getData()
     val newerCount: LiveData<Int> = repository.getNewerCount()
 

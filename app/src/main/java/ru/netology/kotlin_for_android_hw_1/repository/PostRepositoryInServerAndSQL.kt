@@ -33,7 +33,7 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
     private val dataFlow = dao.getPostsAll().map { it -> it.map { it.toPostFromEntity() } }
     private val dataLive: LiveData<List<Post>> = dataFlow.asLiveData(Dispatchers.Default)
     private val newerCountLive = dataLive.switchMap {
-        getPostsNewer(maxOf(it.lastOrNull()?.id ?: 0, it.firstOrNull()?.id ?: 0))
+        getPostsNewer()
             .asLiveData(Dispatchers.Default)
     }
 
@@ -51,7 +51,9 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
             supervisorScope {
                 dao.getUnsaved().forEach { launch { save(it.toPostFromEntity()) } }
             }
-        } finally { println("dao.getUnsaved().forEach FAULT")}
+        } catch (e: Exception) {
+            println("getPostsAllAsync()->dao.getUnsaved().forEach FAULT: $e")
+        }
 
         try {
             val response = PostsRetrofitSuspend.retrofitService.getAll()
@@ -68,6 +70,7 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
             else servStat.postValue(serverStatus(ServerStatus.OK))
         } catch (e: Exception) {
             servStat.postValue(serverStatus(ServerStatus.ERROR))
+            println("getPostsAllAsync()->PostsRetrofitSuspend.retrofitService.getAll() ERROR: $e")
         }
     }
 
@@ -79,6 +82,7 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
             PostsRetrofitSuspend.retrofitService.removeById(id)
         } catch (e: Exception) {
             servStat.postValue(serverStatus(ServerStatus.ERROR))
+            println("removeByID(id: Long)->PostsRetrofitSuspend.retrofitService.removeById(id) ERROR: $e")
         }
     }
 
@@ -89,6 +93,7 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
             PostsRetrofitSuspend.retrofitService.save(post)
         } catch (e: Exception) {
             servStat.postValue(serverStatus(ServerStatus.ERROR))
+            println("edit(post: Post)->PostsRetrofitSuspend.retrofitService.save(post) ERROR: $e")
         }
     }
 
@@ -116,6 +121,7 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
             dao.removeByID(tempId)
         } catch (e: Exception) {
             servStat.postValue(serverStatus(ServerStatus.ERROR))
+            println("save(post: Post)->PostsRetrofitSuspend.retrofitService.save(myPost) ERROR: $e")
         }
     }
 
@@ -129,11 +135,12 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
         } catch (e: Exception) {
             dao.likeByID(id)
             servStat.postValue(serverStatus(ServerStatus.ERROR))
+            println("likeByID(id: Long)->PostsRetrofitSuspend.retrofitService.likeById(id) ERROR: $e")
         }
     }
 
     override suspend fun loadNewer() {
-        println("button pressed")
+        println("Button <loadNewer> pressed")
         flagLoad = true
 
         try {
@@ -149,19 +156,26 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
                 if (!posts.isNullOrEmpty()) {
                     dao.insert(posts.map { PostEntity.fromPostToEntity(it) })
 //                flagLoad = false
-                } else servStat.postValue(serverStatus(ServerStatus.ERROR))
-            } else servStat.postValue(serverStatus(ServerStatus.ERROR))
+                } else {
+                    servStat.postValue(serverStatus(ServerStatus.ERROR))
+                    println("loadNewer()->!posts.isNullOrEmpty() ERROR: if-else")
+                }
+            } else {
+                servStat.postValue(serverStatus(ServerStatus.ERROR))
+                println("loadNewer()->response.isSuccessful ERROR: if-else")
+            }
         } catch (e: Exception) {
             servStat.postValue(serverStatus(ServerStatus.ERROR))
+            println("loadNewer()->PostsRetrofitSuspend.retrofitService.getPostsNewer ERROR: $e")
         }
 
         flagLoad = false
     }
 
-    private fun getPostsNewer(id: Long): Flow<Int> = flow {
+    private fun getPostsNewer(): Flow<Int> = flow {
         while (true) {
             delay(10_000)
-            val response = PostsRetrofitSuspend.retrofitService.getPostsNewer(id)
+            val response = PostsRetrofitSuspend.retrofitService.getPostsNewer(dao.getMaxId() ?: 0L)
             if (response.isSuccessful) {
                 servStat.postValue(serverStatus(ServerStatus.OK))
                 val posts = response.body()
@@ -173,10 +187,14 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
                     }
                 } else
                     emit(0)
-            } else servStat.postValue(serverStatus(ServerStatus.ERROR))
+            } else {
+                servStat.postValue(serverStatus(ServerStatus.ERROR))
+                println("getPostsNewer()->response.isSuccessful ERROR: if-else")
+            }
         }
     }.catch {
         servStat.postValue(serverStatus(ServerStatus.ERROR))
+        println("getPostsNewer()->catch ERROR: CATCH")
     }
 
     private fun <T> retrofitErrorHandler(res: Response<T>): T? {
@@ -185,6 +203,7 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
             return res.body()
         } else {
             servStat.postValue(serverStatus(ServerStatus.ERROR))
+            println("retrofitErrorHandler(res: Response<T>)->res.isSuccessful ERROR: if-else")
         }
         return null
     }
