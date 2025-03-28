@@ -2,10 +2,16 @@ package ru.netology.kotlin_for_android_hw_1
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import ru.netology.kotlin_for_android_hw_1.databinding.FragmentEditorBinding
 import ru.netology.kotlin_for_android_hw_1.viewmodel.PostViewModel
 
@@ -18,17 +24,62 @@ class EditorFragment : Fragment() {
     ): View {
 
         val binding = FragmentEditorBinding.inflate(inflater, container, false)
-
         val viewModel by viewModels<PostViewModel>(ownerProducer = ::requireParentFragment)
 
-//        var fragmentBinding: FragmentEditorBinding? = null
-
         binding.content2.requestFocus()
-
         binding.content2.setText(arguments?.getString("TEXT_TRANSFER"))
 
-        binding.ok.setOnClickListener {
-            println("binding.ok.setOnClickListener")
+        binding.takePhoto.setOnClickListener {
+            println("INFO takePhoto pressed")
+        }
+
+
+        binding.pickPhoto.setOnClickListener {
+            println("INFO pickPhoto pressed")
+        }
+
+        (requireActivity() as AppCompatActivity).setSupportActionBar(binding.toolbarEditor)
+
+        requireActivity().addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.menu_new_post, menu)
+                println("INFO toolbarEditor's menu is inflated")
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                println("INFO toolbarEditor item selected $menuItem")
+                when (menuItem.itemId) {
+                    R.id.saveInToolbarEditor -> {
+
+                        val text = binding.content2.text.toString()
+                        if (text.isNotBlank()) {
+                            viewModel.saveVM(text)
+                        } else {
+                            viewModel.cancelVM()
+                        }
+                        findNavController().navigateUp()
+                        return true
+                    }
+
+                    android.R.id.home -> {
+                        viewModel.cancelVM()
+                        findNavController().navigateUp()
+                        return true
+                    }
+
+                    else -> return false
+                }
+            }
+        }, viewLifecycleOwner)
+
+        return binding.root
+    }
+
+}
+
+
+//        binding.ok.setOnClickListener {
+//            println("binding.ok.setOnClickListener")
 //            val text = binding.content2.text.toString()
 //            if (text.isNotBlank()) {
 //                viewModel.saveVM(text)
@@ -36,7 +87,7 @@ class EditorFragment : Fragment() {
 //                viewModel.cancelVM()
 //            }
 //            findNavController().navigateUp()
-        }
+//        }
 
 
 //        requireActivity().addMenuProvider(object : MenuProvider {
@@ -71,26 +122,4 @@ class EditorFragment : Fragment() {
 //        val settingsMenuItem = binding.toolbar.menu.add(R.string.nmedia)
 
 
-        binding.toolbar.setOnMenuItemClickListener {
-            println("binding.toolbar.setOnMenuItemClickListener")
-            when (it.itemId) {
-                // these ids should match the item ids from my_fragment_menu.xml file
-                R.id.save -> {
-                    println("OK clicked")
-
-                    // by returning 'true' we're saying that the event
-                    // is handled and it shouldn't be propagated further
-                    true
-                }
-
-                else -> {
-                    println("ERROR clicked")
-                    false
-                }
-            }
-        }
-
-        return binding.root
-    }
-
-}
+//        (requireActivity() as AppCompatActivity).supportActionBar?.setDisplayShowHomeEnabled(true)

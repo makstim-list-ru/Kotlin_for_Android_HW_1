@@ -1,5 +1,7 @@
 package ru.netology.kotlin_for_android_hw_1.dto
 
+import ru.netology.kotlin_for_android_hw_1.enumeration.AttachmentType
+
 data class Post(
     val id: Long = 0,
     val author: String = "",
@@ -10,8 +12,13 @@ data class Post(
     val likes: Long = 999,
     val sharesNum: Long = 99,
     val seenNum: Long = 9_999,
-    val video: String = ""
+    val video: String = "",
+    val attachment: Attachment? = null,
+)
 
+data class Attachment(
+    val url: String,
+    val type: AttachmentType,
 )
 
 val postEmpty = Post(
@@ -24,7 +31,8 @@ val postEmpty = Post(
     likes = 0,
     sharesNum = 0,
     seenNum = 0,
-    video = ""
+    video = "",
+    attachment = null,
 )
 
 

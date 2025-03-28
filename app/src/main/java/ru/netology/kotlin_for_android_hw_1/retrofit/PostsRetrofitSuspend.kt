@@ -1,5 +1,6 @@
 package ru.netology.kotlin_for_android_hw_1.retrofit
 
+import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Response
@@ -8,8 +9,11 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.Part
 import retrofit2.http.Path
+import ru.netology.kotlin_for_android_hw_1.dto.Media
 import ru.netology.kotlin_for_android_hw_1.dto.Post
 
 interface PostsRetrofitSuspendInterface {
@@ -33,6 +37,10 @@ interface PostsRetrofitSuspendInterface {
 
     @GET("posts/{id}/newer")
     suspend fun getPostsNewer(@Path("id") id: Long): Response<List<Post>>
+
+    @Multipart
+    @POST("media")
+    suspend fun upload(@Part media: MultipartBody.Part): Response<Media>
 }
 
 object PostsRetrofitSuspend {

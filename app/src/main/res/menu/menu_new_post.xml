@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/save"
+        android:id="@+id/saveInToolbarEditor"
         android:iconTint="?colorOnPrimary"
         android:icon="@drawable/baseline_check_24"
         android:title="menu_save"

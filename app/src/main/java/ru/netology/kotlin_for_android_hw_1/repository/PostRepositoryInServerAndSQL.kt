@@ -18,6 +18,7 @@ import retrofit2.Response
 import ru.netology.kotlin_for_android_hw_1.dto.Post
 import ru.netology.kotlin_for_android_hw_1.entity.PostEntity
 import ru.netology.kotlin_for_android_hw_1.model.FeedModel
+import ru.netology.kotlin_for_android_hw_1.model.PhotoModel
 import ru.netology.kotlin_for_android_hw_1.retrofit.PostsRetrofitSuspend
 import ru.netology.kotlin_for_android_hw_1.roomdb.RoomDBSuspend
 
@@ -36,6 +37,7 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
         getPostsNewer()
             .asLiveData(Dispatchers.Default)
     }
+    private val photoLive = MutableLiveData<PhotoModel?>(null)
 
     @Volatile
     private var flagLoad = false
@@ -43,6 +45,7 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
     override fun getServStat(): LiveData<FeedModel> = servStat
     override fun getData(): LiveData<List<Post>> = dataLive
     override fun getNewerCount() = newerCountLive
+    override fun getPhoto(): LiveData<PhotoModel?> = photoLive
 
     override suspend fun getPostsAllAsync() {
         servStat.value = serverStatus(ServerStatus.LOADING)
@@ -125,6 +128,19 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
         }
     }
 
+//    override suspend fun save(post: Post, uploadMedia: MediaUpload) {
+//        try {
+//            val media = upload(uploadMedia)?: return
+//            // TODO: add support for other types
+//            val postWithAttachment =
+//                post.copy(attachment = Attachment(media.id, AttachmentType.IMAGE))
+//            save(postWithAttachment)
+//        } catch (e: Exception) {
+//            servStat.postValue(serverStatus(ServerStatus.ERROR))
+//            println("save(post: Post)->PostsRetrofitSuspend.retrofitService.save(myPost) ERROR: $e")
+//        }
+//    }
+
     override suspend fun likeByID(id: Long) {
         dao.likeByID(id)
         val post = dao.getPostById(id).toPostFromEntity()
@@ -197,6 +213,29 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
         println("getPostsNewer()->catch ERROR: CATCH")
     }
 
+
+//    override suspend fun upload(upload: MediaUpload): Media? {
+//        try {
+//            val media = MultipartBody.Part.createFormData(
+//                "file", upload.file.name, upload.file.asRequestBody()
+//            )
+//
+//            val response = PostsRetrofitSuspend.retrofitService.upload(media)
+//            if (!response.isSuccessful) {
+//                servStat.postValue(serverStatus(ServerStatus.ERROR))
+//                println("upload->response.isSuccessful ERROR: if-else")
+//                return null
+//            }
+//
+//            return response.body()
+//        } catch (e: Exception) {
+//            servStat.postValue(serverStatus(ServerStatus.ERROR))
+//            println("upload->CATCH ERROR: $e")
+//            return null
+//        }
+//    }
+
+
     private fun <T> retrofitErrorHandler(res: Response<T>): T? {
         if (res.isSuccessful) {
             servStat.postValue(serverStatus(ServerStatus.OK))
@@ -221,6 +260,10 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
     private enum class ServerStatus {
         LOADING, ERROR, EMPTY, REFRESHING, OK
     }
+
+//    fun changePhoto(uri: Uri?, file: File?) {
+//        photoLive.value = PhotoModel(uri, file)
+//    }
 
 }
 
