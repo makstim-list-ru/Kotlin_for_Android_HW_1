@@ -13,6 +13,7 @@ class AppActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
+
         val binding = ActivityAppBinding.inflate(layoutInflater)
         setContentView(binding.root)
 

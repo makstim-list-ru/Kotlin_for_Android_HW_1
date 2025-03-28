@@ -7,3 +7,5 @@
 
     <style name="Theme.Kotlin_for_Android_HW_1" parent="Base.Theme.Kotlin_for_Android_HW_1" />
 </resources>
+
+<!--<style name="Base.Theme.Kotlin_for_Android_HW_1" parent="Theme.Material3.DayNight.NoActionBar">-->
