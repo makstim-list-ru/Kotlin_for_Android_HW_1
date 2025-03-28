@@ -13,7 +13,7 @@ import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.Path
-import ru.netology.kotlin_for_android_hw_1.dto.Media
+import ru.netology.kotlin_for_android_hw_1.media.MediaID
 import ru.netology.kotlin_for_android_hw_1.dto.Post
 
 interface PostsRetrofitSuspendInterface {
@@ -40,7 +40,7 @@ interface PostsRetrofitSuspendInterface {
 
     @Multipart
     @POST("media")
-    suspend fun upload(@Part media: MultipartBody.Part): Response<Media>
+    suspend fun upload(@Part media: MultipartBody.Part): Response<MediaID>
 }
 
 object PostsRetrofitSuspend {

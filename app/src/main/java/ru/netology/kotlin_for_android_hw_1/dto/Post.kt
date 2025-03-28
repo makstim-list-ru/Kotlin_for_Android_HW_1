@@ -1,6 +1,6 @@
 package ru.netology.kotlin_for_android_hw_1.dto
 
-import ru.netology.kotlin_for_android_hw_1.enumeration.AttachmentType
+import ru.netology.kotlin_for_android_hw_1.media.AttachmentType
 
 data class Post(
     val id: Long = 0,

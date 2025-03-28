@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import ru.netology.kotlin_for_android_hw_1.dto.Attachment
 import ru.netology.kotlin_for_android_hw_1.dto.Post
-import ru.netology.kotlin_for_android_hw_1.enumeration.AttachmentType
+import ru.netology.kotlin_for_android_hw_1.media.AttachmentType
 
 @Entity
 data class PostEntity(
@@ -21,7 +21,7 @@ data class PostEntity(
     val seenNum: Long = 9_999,
     val video: String = "",
     @Embedded
-    var attachment: AttachmentEmbeddable? = null,
+    var attachment: AttachmentEntity? = null,
 ) {
     fun toPostFromEntity() = Post(
         id,
@@ -49,12 +49,12 @@ data class PostEntity(
             post.sharesNum,
             post.seenNum,
             post.video,
-            AttachmentEmbeddable.fromPostToEntity(post.attachment)
+            AttachmentEntity.fromPostToEntity(post.attachment)
         )
     }
 }
 
-data class AttachmentEmbeddable(
+data class AttachmentEntity(
     var url: String,
     var type: AttachmentType,
 ) {
@@ -62,7 +62,7 @@ data class AttachmentEmbeddable(
 
     companion object {
         fun fromPostToEntity(postAtt: Attachment?) = postAtt?.let {
-            AttachmentEmbeddable(it.url, it.type)
+            AttachmentEntity(it.url, it.type)
         }
     }
 }

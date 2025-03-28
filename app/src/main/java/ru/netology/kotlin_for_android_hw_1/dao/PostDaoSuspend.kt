@@ -1,6 +1,5 @@
 package ru.netology.kotlin_for_android_hw_1.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
