@@ -102,8 +102,8 @@ class EditorFragment : Fragment() {
                 .crop()
                 .compress(1024)
                 .maxResultSize(
-                    1080,
-                    1080
+                    2048,
+                    2048
                 )
                 .galleryMimeTypes(arrayOf("image/ png", "image/ jpeg", "image/ jpg"))
                 .createIntent { intent ->
