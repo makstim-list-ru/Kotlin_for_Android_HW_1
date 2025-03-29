@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -84,6 +85,9 @@ class PostViewHolder(
             content1.setOnClickListener {
                 callback(post, "post")
             }
+            mediaBox.setOnClickListener {
+                callback(post, "post")
+            }
 
             iButton1.setOnClickListener { view ->
                 val pum = PopupMenu(view.context, view)
@@ -114,6 +118,17 @@ class PostViewHolder(
                 .error(R.drawable.ic_error_100dp)
                 .timeout(10_000)
                 .into(binding.imageView1)
+
+            post.attachment?.let {
+                mediaBox.isVisible = true
+                val urlMedia = "http://10.0.2.2:9999/media/${post.attachment.url}"
+                Glide.with(binding.mediaBox)
+                    .load(urlMedia)
+                    .placeholder(R.drawable.ic_loading_100dp)
+                    .error(R.drawable.ic_error_100dp)
+                    .timeout(10_000)
+                    .into(binding.mediaBox)
+            } ?: { mediaBox.isVisible = false }
         }
     }
 

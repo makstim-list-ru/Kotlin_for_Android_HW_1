@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -29,7 +30,6 @@ class FocusFragment : Fragment() {
         val viewModel by viewModels<PostViewModel>(ownerProducer = ::requireParentFragment)
 
         val postID = arguments?.getString("TEXT_TRANSFER")?.toLong() ?: return binding.root
-
         var posts = viewModel.data.value ?: return binding.root
         var post = posts.filter { it.id == postID }[0]
 
@@ -90,6 +90,17 @@ class FocusFragment : Fragment() {
                 .error(R.drawable.ic_error_100dp)
                 .timeout(10_000)
                 .into(binding.include.imageView1)
+
+            post.attachment?.let {
+                mediaBox.isVisible = true
+                val urlMedia = "http://10.0.2.2:9999/media/${post.attachment?.url}"
+                Glide.with(binding.include.mediaBox)
+                    .load(urlMedia)
+                    .placeholder(R.drawable.ic_loading_100dp)
+                    .error(R.drawable.ic_error_100dp)
+                    .timeout(10_000)
+                    .into(binding.include.mediaBox)
+            } ?: { mediaBox.isVisible = false }
 
         }
 

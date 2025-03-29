@@ -1,6 +1,7 @@
 package ru.netology.kotlin_for_android_hw_1.viewmodel
 
 import android.app.Application
+import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -12,6 +13,7 @@ import ru.netology.kotlin_for_android_hw_1.media.PhotoModel
 import ru.netology.kotlin_for_android_hw_1.model.FeedModel
 import ru.netology.kotlin_for_android_hw_1.repository.PostRepositoryInServerAndSQL
 import ru.netology.kotlin_for_android_hw_1.repository.PostRepositorySuspend
+import java.io.File
 
 class PostViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -22,12 +24,12 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 //    private val repository = PostRepositoryInServer(application)
 //    private val repository = PostRepositoryInServerWithRetrofit(application)
 
-    private val repository : PostRepositorySuspend = PostRepositoryInServerAndSQL(application)
+    private val repository: PostRepositorySuspend = PostRepositoryInServerAndSQL(application)
 
     val dataServerStatus: LiveData<FeedModel> = repository.getServStat()
     val data: LiveData<List<Post>> = repository.getData()
     val newerCount: LiveData<Int> = repository.getNewerCount()
-    val photo : LiveData<PhotoModel?> = repository.getPhoto()
+    val photo: LiveData<PhotoModel?> = repository.getPhoto()
 
     init {
         viewModelScope.launch {
@@ -77,5 +79,13 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
     fun loadNewerVM() {
         viewModelScope.launch { repository.loadNewer() }
+    }
+
+    fun changePhotoVM(uri: Uri?, file: File?) {
+        viewModelScope.launch { repository.changePhoto(uri = uri, file = file) }
+    }
+
+    fun removePhotoVM() {
+        repository.removePhoto()
     }
 }

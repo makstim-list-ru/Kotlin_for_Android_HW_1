@@ -13,7 +13,7 @@ import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.Path
-import ru.netology.kotlin_for_android_hw_1.media.MediaID
+import ru.netology.kotlin_for_android_hw_1.media.MediaUploadResponse
 import ru.netology.kotlin_for_android_hw_1.dto.Post
 
 interface PostsRetrofitSuspendInterface {
@@ -27,7 +27,7 @@ interface PostsRetrofitSuspendInterface {
     suspend fun save(@Body post: Post): Post
 
     @DELETE("posts/{id}")
-    suspend fun removeById(@Path("id") id: Long): Unit
+    suspend fun removeById(@Path("id") id: Long)
 
     @POST("posts/{id}/likes")
     suspend fun likeById(@Path("id") id: Long): Post
@@ -40,7 +40,7 @@ interface PostsRetrofitSuspendInterface {
 
     @Multipart
     @POST("media")
-    suspend fun upload(@Part media: MultipartBody.Part): Response<MediaID>
+    suspend fun upload(@Part media: MultipartBody.Part): Response<MediaUploadResponse>
 }
 
 object PostsRetrofitSuspend {

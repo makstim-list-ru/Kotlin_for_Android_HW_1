@@ -43,7 +43,7 @@
                     android:background="@android:color/transparent"
                     android:inputType="textMultiLine"
                     android:padding="16dp"
-                    tools:text="@tools:sample/lorem[300]" />
+                    tools:text="@tools:sample/lorem[10]" />
 
                 <FrameLayout
                     android:id="@+id/photoContainer"
@@ -78,7 +78,7 @@
             android:orientation="horizontal">
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/pickPhoto"
+                android:id="@+id/make_photo"
                 style="@style/Widget.Material3.Button.IconButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -88,7 +88,7 @@
                 app:iconTint="?colorOnPrimary" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/takePhoto"
+                android:id="@+id/choose_photo"
                 style="@style/Widget.Material3.Button.IconButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

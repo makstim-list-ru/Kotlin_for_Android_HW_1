@@ -22,7 +22,7 @@ import ru.netology.kotlin_for_android_hw_1.dto.Attachment
 import ru.netology.kotlin_for_android_hw_1.dto.Post
 import ru.netology.kotlin_for_android_hw_1.entity.PostEntity
 import ru.netology.kotlin_for_android_hw_1.media.AttachmentType
-import ru.netology.kotlin_for_android_hw_1.media.MediaID
+import ru.netology.kotlin_for_android_hw_1.media.MediaUploadResponse
 import ru.netology.kotlin_for_android_hw_1.media.PhotoModel
 import ru.netology.kotlin_for_android_hw_1.model.FeedModel
 import ru.netology.kotlin_for_android_hw_1.retrofit.PostsRetrofitSuspend
@@ -100,12 +100,14 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
         }
     }
 
-    override suspend fun save(post: Post, file: File?) {
+    override suspend fun save(post: Post) {
         if (post.id > 0) throw Exception("ERROR in fun SAVE, calls with zero id or less are allowed only")
-        var mediaId: MediaID? = null
+
+        var mediaResponse: MediaUploadResponse? = null
+        val file = photoLive.value?.file
         if (file != null && post.id == 0L)
             try {
-                mediaId = upload(file) ?: let {
+                mediaResponse = upload(file) ?: let {
                     println("save(post: Post, file: File)->FAULT upload file failure, next time will be tried")
                     return
                 }
@@ -113,7 +115,7 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
                 println("save(post: Post)->PostsRetrofitSuspend.retrofitService.save(myPost) ERROR: $e")
                 return
             }
-
+//        ++++++++++++++++++++++
         val tempId =
             if (post.id == 0L) dao.getMinId()?.coerceAtMost(0)?.dec() ?: -1 else post.id
 
@@ -122,7 +124,7 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
             author = "Me",
             content = post.content,
             authorAvatar = "sber.jpg",
-            attachment = mediaId?.let { Attachment(it.id, AttachmentType.IMAGE) }
+            attachment = mediaResponse?.let { Attachment(it.id, AttachmentType.IMAGE) }
         )
 
         if (post.id == 0L) dao.save(    // если сохраняется свежий пост с присвоением нового (-)id в ЛБД
@@ -208,10 +210,10 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
     }
 
 
-    override suspend fun upload(file: File): MediaID? {
+    override suspend fun upload(file: File): MediaUploadResponse? {
         try {
             val media = MultipartBody.Part.createFormData(
-                "file_id", file.name, file.asRequestBody()
+                "file", file.name, file.asRequestBody()
             )
 
             val response = PostsRetrofitSuspend.retrofitService.upload(media)
@@ -225,6 +227,14 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
             println("upload->CATCH ERROR: $e")
             return null
         }
+    }
+
+    override suspend fun changePhoto(uri: Uri?, file: File?) {
+        photoLive.value = PhotoModel(uri, file)
+    }
+
+    override fun removePhoto() {
+        photoLive.value = null
     }
 
     private fun <T> retrofitErrorHandler(res: Response<T>): T? {
@@ -252,9 +262,6 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
         LOADING, ERROR, EMPTY, REFRESHING, OK
     }
 
-    private fun changePhoto(uri: Uri?, file: File?) {
-        photoLive.value = PhotoModel(uri, file)
-    }
 
 }
 

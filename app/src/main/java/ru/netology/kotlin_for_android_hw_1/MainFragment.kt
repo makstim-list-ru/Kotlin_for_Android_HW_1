@@ -44,7 +44,7 @@ class MainFragment : Fragment() {
             if (key == "remove") viewModel.removeVM(post.id)
             if (key == "edit") {
                 findNavController().navigate(R.id.action_mainFragment_to_editorFragment,
-                    Bundle().apply { this.putString("TEXT_TRANSFER", post.content) })
+                    Bundle().apply { this.putString("TEXT_TRANSFER", post.id.toString()) })
                 viewModel.editVM(post)
             }
             if (key == "cancel") viewModel.cancelVM()
