@@ -7,5 +7,12 @@
         android:icon="@drawable/baseline_check_24"
         android:title="menu_save"
         app:showAsAction="always" />
+    <item
+        android:id="@+id/homeInToolBarEditor"
+        android:iconTint="?colorOnPrimary"
+        android:icon="@drawable/outline_cancel_24"
+        android:title="menu_home"
+        app:showAsAction="always" />
+        />
 </menu>
 

@@ -7,7 +7,6 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -38,9 +37,9 @@ class EditorFragment : Fragment() {
             println("INFO pickPhoto pressed")
         }
 
-        (requireActivity() as AppCompatActivity).setSupportActionBar(binding.toolbarEditor)
+//        (requireActivity() as AppCompatActivity).setSupportActionBar(binding.toolbarEditor)
 
-        requireActivity().addMenuProvider(object : MenuProvider {
+        binding.toolbarEditor.addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 menuInflater.inflate(R.menu.menu_new_post, menu)
                 println("INFO toolbarEditor's menu is inflated")
