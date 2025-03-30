@@ -47,7 +47,7 @@ class MainFragment : Fragment() {
                     Bundle().apply { this.putString("TEXT_TRANSFER", post.id.toString()) })
                 viewModel.editVM(post)
             }
-            if (key == "cancel") viewModel.cancelVM()
+            if (key == "cancel") viewModel.cancelEditVM()
             if (key == "post") {
                 findNavController().navigate(R.id.action_mainFragment_to_focusFragment,
                     Bundle().apply { this.putString("TEXT_TRANSFER", post.id.toString()) })

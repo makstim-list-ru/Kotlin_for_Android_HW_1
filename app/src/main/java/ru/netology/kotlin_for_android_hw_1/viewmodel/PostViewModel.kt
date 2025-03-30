@@ -54,14 +54,15 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     fun saveVM(content: String) {
 //        val editedPost = editedPostTmp.value?.copy()!!
         val editedPost = requireNotNull(editedPostTmp.value) {
-            println("ERROR_VIEW_MODEL in fun <saveViewModel>, developer's attention is required")
+            println("ERROR_VIEW_MODEL in fun <saveViewModel>")
         }
 
         if (editedPost.id == 0L) {
             viewModelScope.launch { repository.save(Post(content = content)) }
+            cancelEditVM()
         } else {
             viewModelScope.launch { repository.edit(editedPost.copy(content = content)) }
-            editedPostTmp.value = postEmpty
+            cancelEditVM()
         }
     }
 
@@ -69,7 +70,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         editedPostTmp.value = post
     }
 
-    fun cancelVM() {
+    fun cancelEditVM() {
         editedPostTmp.value = postEmpty
     }
 

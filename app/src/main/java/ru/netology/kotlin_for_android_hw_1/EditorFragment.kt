@@ -36,7 +36,19 @@ class EditorFragment : Fragment() {
         val postID = arguments?.getString("TEXT_TRANSFER")?.toLong()
         val post = postID?.let { viewModel.data.value?.filter { it.id == postID }?.get(0) }
         val urlPost = post?.let { "http://10.0.2.2:9999/media/${post.attachment?.url}" }
+        val photoIntentLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { activityResult ->
+                if (activityResult.resultCode == ImagePicker.RESULT_ERROR) {
+                    Toast.makeText(context, "ImagePicker.RESULT_ERROR", Toast.LENGTH_LONG).show()
+                    return@registerForActivityResult
+                }
+                val result = activityResult.data?.data ?: return@registerForActivityResult
+                viewModel.changePhotoVM(result, result.toFile())
+            }
+
+
         binding.content2.setText(post?.content)
+
         urlPost?.let {
             viewModel.changePhotoVM(
                 urlPost.toUri(),
@@ -47,16 +59,6 @@ class EditorFragment : Fragment() {
         binding.content2.requestFocus()
 
         //binding.content2.setText(arguments?.getString("TEXT_TRANSFER"))
-
-        val photoIntentLauncher =
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { activityResult ->
-                if (activityResult.resultCode == ImagePicker.RESULT_ERROR) {
-                    Toast.makeText(context, "ImagePicker.RESULT_ERROR", Toast.LENGTH_LONG).show()
-                    return@registerForActivityResult
-                }
-                val result = activityResult.data?.data ?: return@registerForActivityResult
-                viewModel.changePhotoVM(result, result.toFile())
-            }
 
         viewModel.photo.observe(viewLifecycleOwner) { photo ->
             if (photo == null) {
@@ -127,14 +129,16 @@ class EditorFragment : Fragment() {
                         if (text.isNotBlank()) {
                             viewModel.saveVM(text)
                         } else {
-                            viewModel.cancelVM()
+                            viewModel.cancelEditVM()
+                            viewModel.removePhotoVM()
                         }
                         findNavController().navigateUp()
                         return true
                     }
 
                     R.id.homeInToolBarEditor -> {
-                        viewModel.cancelVM()
+                        viewModel.cancelEditVM()
+                        viewModel.removePhotoVM()
                         findNavController().navigateUp()
                         return true
                     }
@@ -143,7 +147,6 @@ class EditorFragment : Fragment() {
                 }
             }
         }, viewLifecycleOwner)
-
 
         return binding.root
     }
