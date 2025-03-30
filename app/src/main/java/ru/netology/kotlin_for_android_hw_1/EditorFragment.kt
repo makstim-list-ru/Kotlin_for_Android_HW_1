@@ -52,7 +52,8 @@ class EditorFragment : Fragment() {
         urlPost?.let {
             viewModel.changePhotoVM(
                 urlPost.toUri(),
-                urlPost.toUri().path?.let { File(it) }
+                urlPost.toUri().path?.let { File(it) },
+//                urlPost.toUri().toFile()
             )
         }
 
@@ -60,7 +61,7 @@ class EditorFragment : Fragment() {
 
         //binding.content2.setText(arguments?.getString("TEXT_TRANSFER"))
 
-        viewModel.photo.observe(viewLifecycleOwner) { photo ->
+        viewModel.photoLive.observe(viewLifecycleOwner) { photo ->
             if (photo == null) {
                 binding.photoContainer.isVisible = false
                 return@observe
@@ -68,7 +69,7 @@ class EditorFragment : Fragment() {
                 binding.photoContainer.isVisible = true
             }
 
-            val url = viewModel.photo.value?.uri
+            val url = viewModel.photoLive.value?.uri
             Glide.with(binding.photo)
                 .load(url)
                 .circleCrop()

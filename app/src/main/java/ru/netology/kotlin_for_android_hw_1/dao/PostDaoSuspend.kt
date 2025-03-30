@@ -6,7 +6,9 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import kotlinx.coroutines.flow.Flow
+import ru.netology.kotlin_for_android_hw_1.entity.AttachmentEntity
 import ru.netology.kotlin_for_android_hw_1.entity.PostEntity
+import ru.netology.kotlin_for_android_hw_1.media.AttachmentType
 
 @Dao
 interface PostDaoSuspend {
@@ -52,11 +54,20 @@ interface PostDaoSuspend {
         insert(post)
     }
 
+    @Query("UPDATE PostEntity SET content = :content, url = :url, type = :type WHERE id = :id")
+    suspend fun edit(id: Long, content: String, url: String, type: AttachmentType)
+
     @Query("UPDATE PostEntity SET content = :content WHERE id = :id")
     suspend fun edit(id: Long, content: String)
 
     suspend fun edit(post: PostEntity) {
-        edit(post.id, post.content)
+        if (post.attachment != null) edit(
+            post.id,
+            post.content,
+            post.attachment!!.url,
+            post.attachment!!.type
+        )
+        else edit(post.id, post.content)
     }
 
     @Query("SELECT EXISTS(SELECT 1 FROM PostEntity)")

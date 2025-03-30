@@ -4,7 +4,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -55,8 +54,10 @@ class PostViewHolder(
             if (post.video != "") {
                 videoButton.text = post.video
                 videoButton.visibility = View.VISIBLE
-            } else
+            } else {
+                videoButton.text = ""
                 videoButton.visibility = View.GONE
+            }
 
             videoButton.setOnClickListener {
                 callback(post, "video")
@@ -119,16 +120,18 @@ class PostViewHolder(
                 .timeout(10_000)
                 .into(binding.imageView1)
 
+            Glide.with(mediaBox).clear(mediaBox)
+            mediaBox.visibility = View.GONE
             post.attachment?.let {
-                mediaBox.isVisible = true
+                mediaBox.visibility = View.VISIBLE
                 val urlMedia = "http://10.0.2.2:9999/media/${post.attachment.url}"
-                Glide.with(binding.mediaBox)
+                Glide.with(mediaBox)
                     .load(urlMedia)
                     .placeholder(R.drawable.ic_loading_100dp)
                     .error(R.drawable.ic_error_100dp)
                     .timeout(10_000)
-                    .into(binding.mediaBox)
-            } ?: { mediaBox.isVisible = false }
+                    .into(mediaBox)
+            }
         }
     }
 

@@ -1,7 +1,6 @@
 package ru.netology.kotlin_for_android_hw_1.repository
 
 import android.content.Context
-import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
@@ -23,7 +22,6 @@ import ru.netology.kotlin_for_android_hw_1.dto.Post
 import ru.netology.kotlin_for_android_hw_1.entity.PostEntity
 import ru.netology.kotlin_for_android_hw_1.media.AttachmentType
 import ru.netology.kotlin_for_android_hw_1.media.MediaUploadResponse
-import ru.netology.kotlin_for_android_hw_1.media.PhotoModel
 import ru.netology.kotlin_for_android_hw_1.model.FeedModel
 import ru.netology.kotlin_for_android_hw_1.retrofit.PostsRetrofitSuspend
 import ru.netology.kotlin_for_android_hw_1.roomdb.RoomDBSuspend
@@ -33,16 +31,14 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
 
 
     private val servStat = MutableLiveData(FeedModel())
-    private val db =
-        Room.databaseBuilder(context, RoomDBSuspend::class.java, "database.db")
-            .build()
+    private val db = Room.databaseBuilder(context, RoomDBSuspend::class.java, "database.db").build()
     private val dao = db.getPostDao()
     private val dataFlow = dao.getPostsAll().map { it -> it.map { it.toPostFromEntity() } }
     private val dataLive: LiveData<List<Post>> = dataFlow.asLiveData(Dispatchers.Default)
     private val newerCountLive = dataLive.switchMap {
         getPostsNewer().asLiveData(Dispatchers.Default)
     }
-    private val photoLive = MutableLiveData<PhotoModel?>(null)
+
 
     @Volatile
     private var flagLoad = false
@@ -50,7 +46,7 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
     override fun getServStat(): LiveData<FeedModel> = servStat
     override fun getData(): LiveData<List<Post>> = dataLive
     override fun getNewerCount() = newerCountLive
-    override fun getPhoto(): LiveData<PhotoModel?> = photoLive
+
 
     override suspend fun getPostsAllAsync() {
         servStat.value = serverStatus(ServerStatus.LOADING)
@@ -89,43 +85,69 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
         }
     }
 
-    override suspend fun edit(post: Post) {
+    override suspend fun edit(post: Post, uploadFile: File?) {
+
+        var responseUpload: MediaUploadResponse? = null
+
+        if (uploadFile != null) try {
+            responseUpload = upload(uploadFile) ?: let {
+                println("save(post: Post, file: File)->FAULT upload file failure")
+                return
+            }
+        } catch (e: Exception) {
+            println("save(post: Post)->retrofitService.save(myPost) ERROR: $e")
+            return
+        }
+
+        val post = post.copy(attachment = responseUpload?.let { Attachment(it.id, AttachmentType.IMAGE) })
+
         dao.edit(PostEntity.fromPostToEntity(post))
 
         try {
             PostsRetrofitSuspend.retrofitService.save(post)
         } catch (e: Exception) {
             servStat.postValue(serverStatus(ServerStatus.ERROR))
-            println("edit(post: Post)->PostsRetrofitSuspend.retrofitService.save(post) ERROR: $e")
+            println("edit(post: Post)->retrofitService.save(postWithAtt) ERROR: $e")
         }
     }
 
-    override suspend fun save(post: Post) {
-        if (post.id > 0) throw Exception("ERROR in fun SAVE, calls with zero id or less are allowed only")
+    override suspend fun save(post: Post, uploadFile: File?) {
 
-        var mediaResponse: MediaUploadResponse? = null
-        val file = photoLive.value?.file
-        if (file != null && post.id == 0L)
-            try {
-                mediaResponse = upload(file) ?: let {
-                    println("save(post: Post, file: File)->FAULT upload file failure, next time will be tried")
+        var responseUpload: MediaUploadResponse? = null
+        val tempId: Long
+
+        when {
+            post.id > 0L -> {
+                throw Exception("ERROR in save(post: Post, uploadFile: File?)")
+            }
+
+            post.id == 0L -> {
+                if (uploadFile != null) try {
+                    responseUpload = upload(uploadFile) ?: let {
+                        println("save(post: Post, file: File)->FAULT upload file failure")
+                        return
+                    }
+                } catch (e: Exception) {
+                    println("save(post: Post)->retrofitService.save(myPost) ERROR: $e")
                     return
                 }
-            } catch (e: Exception) {
-                println("save(post: Post)->PostsRetrofitSuspend.retrofitService.save(myPost) ERROR: $e")
-                return
+                tempId = dao.getMinId()?.coerceAtMost(0)?.dec() ?: -1
+
             }
+
+            else -> { // post.id<0L
+                tempId = post.id
+            }
+        }
+
 //        ++++++++++++++++++++++
-        val tempId =
-            if (post.id == 0L) dao.getMinId()?.coerceAtMost(0)?.dec() ?: -1 else post.id
+//        tempId = if (post.id == 0L) dao.getMinId()?.coerceAtMost(0)?.dec() ?: -1 else post.id
 
         val tempPost = post.copy(
             id = tempId,
             author = "Me",
-            content = post.content,
             authorAvatar = "sber.jpg",
-            attachment = mediaResponse?.let { Attachment(it.id, AttachmentType.IMAGE) }
-        )
+            attachment = responseUpload?.let { Attachment(it.id, AttachmentType.IMAGE) })
 
         if (post.id == 0L) dao.save(    // если сохраняется свежий пост с присвоением нового (-)id в ЛБД
             PostEntity.fromPostToEntity(tempPost)
@@ -137,7 +159,7 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
             dao.removeByID(tempId)
         } catch (e: Exception) {
             servStat.postValue(serverStatus(ServerStatus.ERROR))
-            println("save(post: Post)->PostsRetrofitSuspend.retrofitService.save(myPost) ERROR: $e")
+            println("save(post: Post)->retrofitService.save(myPost) ERROR: $e")
         }
     }
 
@@ -186,8 +208,7 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
     private fun getPostsNewer(): Flow<Int> = flow {
         while (true) {
             delay(10_000)
-            val response =
-                PostsRetrofitSuspend.retrofitService.getPostsNewer(dao.getMaxId() ?: 0L)
+            val response = PostsRetrofitSuspend.retrofitService.getPostsNewer(dao.getMaxId() ?: 0L)
             if (response.isSuccessful) {
                 servStat.postValue(serverStatus(ServerStatus.OK))
                 val posts = response.body()
@@ -197,8 +218,7 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
                     } else {
                         emit(posts.size)
                     }
-                } else
-                    emit(0)
+                } else emit(0)
             } else {
                 servStat.postValue(serverStatus(ServerStatus.ERROR))
                 println("getPostsNewer()->response.isSuccessful ERROR: if-else")
@@ -229,13 +249,6 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
         }
     }
 
-    override suspend fun changePhoto(uri: Uri?, file: File?) {
-        photoLive.value = PhotoModel(uri, file)
-    }
-
-    override fun removePhoto() {
-        photoLive.value = null
-    }
 
     private fun <T> retrofitErrorHandler(res: Response<T>): T? {
         if (res.isSuccessful) {

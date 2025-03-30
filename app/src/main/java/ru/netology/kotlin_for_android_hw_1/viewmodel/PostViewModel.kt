@@ -25,11 +25,14 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 //    private val repository = PostRepositoryInServerWithRetrofit(application)
 
     private val repository: PostRepositorySuspend = PostRepositoryInServerAndSQL(application)
+    private val _photoLive = MutableLiveData<PhotoModel?>(null)
 
+    val photoLive: LiveData<PhotoModel?>
+        get() = _photoLive
     val dataServerStatus: LiveData<FeedModel> = repository.getServStat()
     val data: LiveData<List<Post>> = repository.getData()
     val newerCount: LiveData<Int> = repository.getNewerCount()
-    val photo: LiveData<PhotoModel?> = repository.getPhoto()
+
 
     init {
         viewModelScope.launch {
@@ -53,16 +56,16 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
     fun saveVM(content: String) {
 //        val editedPost = editedPostTmp.value?.copy()!!
-        val editedPost = requireNotNull(editedPostTmp.value) {
-            println("ERROR_VIEW_MODEL in fun <saveViewModel>")
-        }
+        val editedPost = requireNotNull(editedPostTmp.value) { println("ERROR in <saveViewModel>") }
 
-        if (editedPost.id == 0L) {
-            viewModelScope.launch { repository.save(Post(content = content)) }
+        if (editedPost.id == 0L) { //SAVE NEW
+            viewModelScope.launch { repository.save(Post(content = content), photoLive.value?.file) }
             cancelEditVM()
-        } else {
-            viewModelScope.launch { repository.edit(editedPost.copy(content = content)) }
+            removePhotoVM()
+        } else { //EDIT
+            viewModelScope.launch { repository.edit(editedPost.copy(content = content), photoLive.value?.file) }
             cancelEditVM()
+            removePhotoVM()
         }
     }
 
@@ -83,10 +86,10 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun changePhotoVM(uri: Uri?, file: File?) {
-        viewModelScope.launch { repository.changePhoto(uri = uri, file = file) }
+        _photoLive.value = PhotoModel(uri, file)
     }
 
     fun removePhotoVM() {
-        repository.removePhoto()
+        _photoLive.value = null
     }
 }
