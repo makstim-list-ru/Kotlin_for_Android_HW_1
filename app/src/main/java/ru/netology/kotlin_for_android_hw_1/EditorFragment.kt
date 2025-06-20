@@ -90,8 +90,8 @@ class EditorFragment : Fragment() {
                 .crop()                    //Crop image(Optional), Check Customization for more option
                 .compress(1024)            //Final image size will be less than 1 MB(Optional)
                 .maxResultSize(
-                    1080,
-                    1080
+                    2048,
+                    2048
                 )    //Final image resolution will be less than 1080 x 1080(Optional)
                 .createIntent { intent ->
                     photoIntentLauncher.launch(intent)
@@ -108,7 +108,7 @@ class EditorFragment : Fragment() {
                     2048,
                     2048
                 )
-                .galleryMimeTypes(arrayOf("image/ png", "image/ jpeg", "image/ jpg"))
+                .galleryMimeTypes(arrayOf("image/png", "image/jpeg", "image/jpg"))
                 .createIntent { intent ->
                     photoIntentLauncher.launch(intent)
                 }

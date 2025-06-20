@@ -60,13 +60,11 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
         if (editedPost.id == 0L) { //SAVE NEW
             viewModelScope.launch { repository.save(Post(content = content), photoLive.value?.file) }
-            cancelEditVM()
-            removePhotoVM()
         } else { //EDIT
             viewModelScope.launch { repository.edit(editedPost.copy(content = content), photoLive.value?.file) }
-            cancelEditVM()
-            removePhotoVM()
         }
+        cancelEditVM()
+        removePhotoVM()
     }
 
     fun editVM(post: Post) {
