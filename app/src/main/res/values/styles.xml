@@ -11,6 +11,7 @@
         <item name="iconTint">?attr/colorOnPrimary</item>
         <item name="android:textColor">?attr/colorOnPrimary</item>
         <item name="android:background">?attr/colorPrimary</item>
+        <item name="android:textColorSecondary">?attr/colorOnPrimary</item>
     </style>
 
 </resources>

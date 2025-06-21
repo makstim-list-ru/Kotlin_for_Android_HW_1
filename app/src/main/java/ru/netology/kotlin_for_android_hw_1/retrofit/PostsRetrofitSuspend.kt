@@ -13,6 +13,7 @@ import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.Path
+import ru.netology.kotlin_for_android_hw_1.auth.AppAuthorization
 import ru.netology.kotlin_for_android_hw_1.media.MediaUploadResponse
 import ru.netology.kotlin_for_android_hw_1.dto.Post
 
@@ -50,6 +51,15 @@ object PostsRetrofitSuspend {
 
     private val okhttp = OkHttpClient.Builder()
         .addInterceptor(logging)
+        .addInterceptor { chain ->
+            val newRequest =
+                AppAuthorization.getInstance().authStateFlow.value.token?.let { token ->
+                    chain.request().newBuilder()
+                        .addHeader("Authorization", token)
+                        .build()
+                } ?: chain.request()
+            chain.proceed(newRequest)
+        }
         .build()
 
     private const val BASE_URL = "http://10.0.2.2:9999/api/slow/"

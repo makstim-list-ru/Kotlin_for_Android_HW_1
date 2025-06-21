@@ -4,15 +4,25 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import ru.netology.kotlin_for_android_hw_1.adapter.PostsAdapter
+import ru.netology.kotlin_for_android_hw_1.auth.AppAuthorization
 import ru.netology.kotlin_for_android_hw_1.databinding.FragmentMainBinding
+import ru.netology.kotlin_for_android_hw_1.viewmodel.AuthViewModel
 import ru.netology.kotlin_for_android_hw_1.viewmodel.PostViewModel
 
 class MainFragment : Fragment() {
@@ -24,6 +34,7 @@ class MainFragment : Fragment() {
         val binding = FragmentMainBinding.inflate(inflater, container, false)
 
         val viewModel by viewModels<PostViewModel>(ownerProducer = ::requireParentFragment)
+
 
         val adapter = PostsAdapter { post, key ->
             if (key == "like") viewModel.likeVM(post.id)
@@ -101,6 +112,48 @@ class MainFragment : Fragment() {
             binding.newerPostsButton.isVisible = false
             viewModel.loadNewerVM()
         }
+
+
+        binding.toolbarAuth.addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+
+                val authViewModel: AuthViewModel by viewModels()
+
+                menuInflater.inflate(R.menu.menu_main, menu)
+                println("INFO toolbarMain's menu is inflated")
+
+                authViewModel.data.flowWithLifecycle(lifecycle).onEach {
+                    menu.setGroupVisible(R.id.unauthenticated, !authViewModel.authenticated)
+                    menu.setGroupVisible(R.id.authenticated, authViewModel.authenticated)
+                }
+                    .launchIn(lifecycleScope)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                println("INFO toolbarEditor item selected $menuItem")
+                when (menuItem.itemId) {
+                    R.id.signin -> {
+                        // TODO: just hardcode it, implementation must be in homework
+                        AppAuthorization.getInstance().setAuth(5, "x-token")
+                        return true
+                    }
+
+                    R.id.signup -> {
+                        // TODO: just hardcode it, implementation must be in homework
+                        AppAuthorization.getInstance().setAuth(5, "x-token")
+                        return true
+                    }
+
+                    R.id.signout -> {
+                        // TODO: just hardcode it, implementation must be in homework
+                        AppAuthorization.getInstance().removeAuth()
+                        return true
+                    }
+
+                    else -> return false
+                }
+            }
+        }, viewLifecycleOwner)
 
         return binding.root
     }
