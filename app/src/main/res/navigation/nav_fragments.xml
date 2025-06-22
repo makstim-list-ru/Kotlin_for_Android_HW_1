@@ -15,6 +15,9 @@
         <action
             android:id="@+id/action_mainFragment_to_focusFragment"
             app:destination="@id/focusFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_authFragment"
+            app:destination="@id/authFragment" />
     </fragment>
     <fragment
         android:id="@+id/editorFragment"
@@ -30,4 +33,9 @@
             android:id="@+id/action_focusFragment_to_editorFragment"
             app:destination="@id/editorFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/authFragment"
+        android:name="ru.netology.kotlin_for_android_hw_1.AuthFragment"
+        android:label="AuthFragment"
+        tools:layout="@layout/fragment_auth"/>
 </navigation>

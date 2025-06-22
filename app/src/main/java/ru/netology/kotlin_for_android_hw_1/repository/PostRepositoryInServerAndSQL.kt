@@ -17,6 +17,7 @@ import kotlinx.coroutines.supervisorScope
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.Response
+import ru.netology.kotlin_for_android_hw_1.auth.AuthUploadResponse
 import ru.netology.kotlin_for_android_hw_1.dto.Attachment
 import ru.netology.kotlin_for_android_hw_1.dto.Post
 import ru.netology.kotlin_for_android_hw_1.entity.PostEntity
@@ -46,6 +47,8 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
     override fun getServStat(): LiveData<FeedModel> = servStat
     override fun getData(): LiveData<List<Post>> = dataLive
     override fun getNewerCount() = newerCountLive
+
+    override fun getDataFlow(): Flow<List<Post>> = dataFlow
 
 
     override suspend fun getPostsAllAsync() {
@@ -99,7 +102,8 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
             return
         }
 
-        val post = post.copy(attachment = responseUpload?.let { Attachment(it.id, AttachmentType.IMAGE) })
+        val post =
+            post.copy(attachment = responseUpload?.let { Attachment(it.id, AttachmentType.IMAGE) })
 
         dao.edit(PostEntity.fromPostToEntity(post))
 
@@ -248,6 +252,8 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
             return null
         }
     }
+
+
 
 
     private fun <T> retrofitErrorHandler(res: Response<T>): T? {

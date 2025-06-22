@@ -133,8 +133,7 @@ class MainFragment : Fragment() {
                 println("INFO toolbarEditor item selected $menuItem")
                 when (menuItem.itemId) {
                     R.id.signin -> {
-                        // TODO: just hardcode it, implementation must be in homework
-                        AppAuthorization.getInstance().setAuth(5, "x-token")
+                        findNavController().navigate(R.id.action_mainFragment_to_authFragment)
                         return true
                     }
 

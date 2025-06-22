@@ -11,6 +11,7 @@ import ru.netology.kotlin_for_android_hw_1.media.AttachmentType
 data class PostEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
+    val authorId: Long = 0,
     val author: String = "",
     val authorAvatar: String = "",
     val published: String = "",
@@ -25,6 +26,7 @@ data class PostEntity(
 ) {
     fun toPostFromEntity() = Post(
         id,
+        authorId,
         author,
         authorAvatar,
         published,
@@ -40,6 +42,7 @@ data class PostEntity(
     companion object {
         fun fromPostToEntity(post: Post) = PostEntity(
             post.id,
+            post.authorId,
             post.author,
             post.authorAvatar,
             post.published,

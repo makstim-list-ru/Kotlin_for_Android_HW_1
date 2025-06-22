@@ -90,6 +90,8 @@ class PostViewHolder(
                 callback(post, "post")
             }
 
+            iButton1.visibility = if (post.ownedByMe) View.VISIBLE else View.INVISIBLE
+
             iButton1.setOnClickListener { view ->
                 val pum = PopupMenu(view.context, view)
                 pum.inflate(R.menu.menu_options)

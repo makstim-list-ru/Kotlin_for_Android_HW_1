@@ -4,6 +4,7 @@ import ru.netology.kotlin_for_android_hw_1.media.AttachmentType
 
 data class Post(
     val id: Long = 0,
+    val authorId: Long = 0,
     val author: String = "",
     val authorAvatar: String = "",
     val published: String = "",
@@ -14,6 +15,7 @@ data class Post(
     val seenNum: Long = 9_999,
     val video: String = "",
     val attachment: Attachment? = null,
+    val ownedByMe: Boolean = false,
 )
 
 data class Attachment(
@@ -23,6 +25,7 @@ data class Attachment(
 
 val postEmpty = Post(
     id = 0,
+    authorId = 0,
     author = "",
     authorAvatar = "",
     published = "",
@@ -33,6 +36,7 @@ val postEmpty = Post(
     seenNum = 0,
     video = "",
     attachment = null,
+    ownedByMe = false,
 )
 
 

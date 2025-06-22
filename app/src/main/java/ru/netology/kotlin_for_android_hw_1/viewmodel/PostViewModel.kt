@@ -5,8 +5,14 @@ import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import ru.netology.kotlin_for_android_hw_1.auth.AppAuthorization
 import ru.netology.kotlin_for_android_hw_1.dto.Post
 import ru.netology.kotlin_for_android_hw_1.dto.postEmpty
 import ru.netology.kotlin_for_android_hw_1.media.PhotoModel
@@ -15,6 +21,7 @@ import ru.netology.kotlin_for_android_hw_1.repository.PostRepositoryInServerAndS
 import ru.netology.kotlin_for_android_hw_1.repository.PostRepositorySuspend
 import java.io.File
 
+@ExperimentalCoroutinesApi
 class PostViewModel(application: Application) : AndroidViewModel(application) {
 
 //    private val repository = PostRepositoryInMemory()
@@ -30,8 +37,16 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     val photoLive: LiveData<PhotoModel?>
         get() = _photoLive
     val dataServerStatus: LiveData<FeedModel> = repository.getServStat()
-    val data: LiveData<List<Post>> = repository.getData()
+
     val newerCount: LiveData<Int> = repository.getNewerCount()
+
+    //    val data: LiveData<List<Post>> = repository.getData()
+    val data: LiveData<List<Post>> = AppAuthorization.getInstance()
+        .authStateFlow
+        .flatMapLatest { (myId, _) ->
+            repository.getDataFlow()
+                .map { posts -> posts.map { it.copy(ownedByMe = it.authorId == myId) } }
+        }.asLiveData(Dispatchers.Default)
 
 
     init {
@@ -59,9 +74,19 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         val editedPost = requireNotNull(editedPostTmp.value) { println("ERROR in <saveViewModel>") }
 
         if (editedPost.id == 0L) { //SAVE NEW
-            viewModelScope.launch { repository.save(Post(content = content), photoLive.value?.file) }
+            viewModelScope.launch {
+                repository.save(
+                    Post(content = content),
+                    photoLive.value?.file
+                )
+            }
         } else { //EDIT
-            viewModelScope.launch { repository.edit(editedPost.copy(content = content), photoLive.value?.file) }
+            viewModelScope.launch {
+                repository.edit(
+                    editedPost.copy(content = content),
+                    photoLive.value?.file
+                )
+            }
         }
         cancelEditVM()
         removePhotoVM()
