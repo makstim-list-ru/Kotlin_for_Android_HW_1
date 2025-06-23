@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1078262743072",
+    "project_id": "netologyfb",
+    "storage_bucket": "netologyfb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1078262743072:android:e9a99d7598863c1d197c45",
+        "android_client_info": {
+          "package_name": "ru.netology.kotlin_for_android_hw_1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD5Jahf6btLKdcdh-0RBPt7LhvKEew3gUY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
