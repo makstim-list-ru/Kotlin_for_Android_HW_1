@@ -1,9 +1,10 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    id ("org.jetbrains.kotlin.kapt")
+
     alias(libs.plugins.google.gms.google.services)
     id("com.google.dagger.hilt.android")
+    id("org.jetbrains.kotlin.kapt")
 }
 
 android {
@@ -60,7 +61,9 @@ dependencies {
     implementation(libs.androidx.swiperefreshlayout)
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.firebase.messaging)
-    kapt("androidx.room:room-compiler:2.6.1")
+    kapt(libs.androidx.room.compiler.v272)
+
+    //kapt("androidx.room:room-compiler:2.7.2")
 
     implementation("com.google.dagger:hilt-android:2.56.2")
     kapt("com.google.dagger:hilt-compiler:2.56.2")
@@ -81,5 +84,5 @@ dependencies {
 }
 
 kapt {
-    correctErrorTypes=true
+    correctErrorTypes = true
 }

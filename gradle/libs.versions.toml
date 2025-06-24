@@ -2,36 +2,29 @@
 agp = "8.8.0"
 imagepicker = "2.1"
 kotlin = "2.0.21"
-coreKtx = "1.15.0"
+coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
-appcompat = "1.7.0"
+appcompat = "1.7.1"
 material = "1.12.0"
-activity = "1.10.0"
-constraintlayout = "2.2.0"
-navigationFragmentKtx = "2.8.5"
-navigationUiKtx = "2.8.5"
-gson = "2.11.0"
+activity = "1.10.1"
+constraintlayout = "2.2.1"
 okhttpBom = "4.12.0"
-roomCommon = "2.6.1"
-roomCompiler = "2.6.1"
-comAndroidLegacyKaptGradlePlugin = "8.10.0-alpha02"
-roomKtx = "2.6.1"
-orgJetbrainsKotlinKaptGradlePlugin = "2.1.20-Beta2"
-roomRuntime = "2.6.1"
+roomCompilerVersion = "2.7.2"
+roomKtx = "2.7.2"
+roomRuntime = "2.7.2"
 glide = "5.0.0-rc01"
-retrofit = "2.11.0"
-converterGson = "2.11.0"
+retrofit = "3.0.0"
+converterGson = "3.0.0"
 swiperefreshlayout = "1.1.0"
-lifecycleLivedataKtx = "2.8.7"
-playServicesCastFramework = "22.0.0"
-glance = "1.1.1"
+lifecycleLivedataKtx = "2.9.1"
 googleGmsGoogleServices = "4.4.2"
 firebaseMessaging = "24.1.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-room-compiler-v272 = { module = "androidx.room:room-compiler", version.ref = "roomCompilerVersion" }
 imagepicker = { module = "com.github.Dhaval2404:ImagePicker", version.ref = "imagepicker" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -41,24 +34,18 @@ logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
-androidx-navigation-fragment-ktx = { group = "androidx.navigation", name = "navigation-fragment-ktx", version = "2.8.6" }
-androidx-navigation-ui-ktx = { group = "androidx.navigation", name = "navigation-ui-ktx", version = "2.8.6" }
-gson = { group = "com.google.code.gson", name = "gson", version = "2.12.1" }
-androidx-room-common = { group = "androidx.room", name = "room-common", version.ref = "roomCommon" }
-androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "roomCompiler" }
-com-android-legacy-kapt-gradle-plugin = { group = "com.android.legacy-kapt", name = "com.android.legacy-kapt.gradle.plugin", version.ref = "comAndroidLegacyKaptGradlePlugin" }
+androidx-navigation-fragment-ktx = { group = "androidx.navigation", name = "navigation-fragment-ktx", version = "2.9.0" }
+androidx-navigation-ui-ktx = { group = "androidx.navigation", name = "navigation-ui-ktx", version = "2.9.0" }
+gson = { group = "com.google.code.gson", name = "gson", version = "2.13.1" }
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomKtx" }
 okhttp = { module = "com.squareup.okhttp3:okhttp" }
 okhttp-bom = { module = "com.squareup.okhttp3:okhttp-bom", version.ref = "okhttpBom" }
-org-jetbrains-kotlin-kapt-gradle-plugin = { group = "org.jetbrains.kotlin.kapt", name = "org.jetbrains.kotlin.kapt.gradle.plugin", version.ref = "orgJetbrainsKotlinKaptGradlePlugin" }
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "roomRuntime" }
 glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "converterGson" }
 androidx-swiperefreshlayout = { group = "androidx.swiperefreshlayout", name = "swiperefreshlayout", version.ref = "swiperefreshlayout" }
 androidx-lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycleLivedataKtx" }
-play-services-cast-framework = { group = "com.google.android.gms", name = "play-services-cast-framework", version.ref = "playServicesCastFramework" }
-androidx-glance = { group = "androidx.glance", name = "glance", version.ref = "glance" }
 firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging", version.ref = "firebaseMessaging" }
 
 [plugins]
