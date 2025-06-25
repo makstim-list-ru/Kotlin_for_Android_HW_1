@@ -13,10 +13,13 @@ import android.widget.Toast
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import ru.netology.kotlin_for_android_hw_1.adapter.PostsAdapter
@@ -25,7 +28,9 @@ import ru.netology.kotlin_for_android_hw_1.databinding.FragmentMainBinding
 import ru.netology.kotlin_for_android_hw_1.viewmodel.AuthViewModel
 import ru.netology.kotlin_for_android_hw_1.viewmodel.PostViewModel
 
+@AndroidEntryPoint
 class MainFragment : Fragment() {
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -33,7 +38,7 @@ class MainFragment : Fragment() {
     ): View {
         val binding = FragmentMainBinding.inflate(inflater, container, false)
 
-        val viewModel by viewModels<PostViewModel>(ownerProducer = ::requireParentFragment)
+        val viewModel by activityViewModels<PostViewModel>()
 
 
         val adapter = PostsAdapter { post, key ->

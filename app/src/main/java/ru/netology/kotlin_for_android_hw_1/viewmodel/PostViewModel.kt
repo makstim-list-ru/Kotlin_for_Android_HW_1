@@ -7,6 +7,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flatMapLatest
@@ -17,12 +18,16 @@ import ru.netology.kotlin_for_android_hw_1.dto.Post
 import ru.netology.kotlin_for_android_hw_1.dto.postEmpty
 import ru.netology.kotlin_for_android_hw_1.media.PhotoModel
 import ru.netology.kotlin_for_android_hw_1.model.FeedModel
-import ru.netology.kotlin_for_android_hw_1.repository.PostRepositoryInServerAndSQL
 import ru.netology.kotlin_for_android_hw_1.repository.PostRepositorySuspend
 import java.io.File
+import javax.inject.Inject
 
+@HiltViewModel
 @ExperimentalCoroutinesApi
-class PostViewModel(application: Application) : AndroidViewModel(application) {
+class PostViewModel @Inject constructor(
+    application: Application,
+    private val repository: PostRepositorySuspend
+) : AndroidViewModel(application) {
 
 //    private val repository = PostRepositoryInMemory()
 //    private val repository = PostRepositoryInFile(application)
@@ -31,7 +36,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 //    private val repository = PostRepositoryInServer(application)
 //    private val repository = PostRepositoryInServerWithRetrofit(application)
 
-    private val repository: PostRepositorySuspend = PostRepositoryInServerAndSQL(application)
+//    private val repository: PostRepositorySuspend = PostRepositoryInServerAndSQL(application)
     private val _photoLive = MutableLiveData<PhotoModel?>(null)
 
     val photoLive: LiveData<PhotoModel?>

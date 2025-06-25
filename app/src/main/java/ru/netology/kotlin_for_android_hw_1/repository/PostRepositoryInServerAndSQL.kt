@@ -1,11 +1,9 @@
 package ru.netology.kotlin_for_android_hw_1.repository
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.switchMap
-import androidx.room.Room
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -17,23 +15,29 @@ import kotlinx.coroutines.supervisorScope
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.Response
-import ru.netology.kotlin_for_android_hw_1.auth.AuthUploadResponse
+import ru.netology.kotlin_for_android_hw_1.dao.PostDaoSuspend
 import ru.netology.kotlin_for_android_hw_1.dto.Attachment
 import ru.netology.kotlin_for_android_hw_1.dto.Post
 import ru.netology.kotlin_for_android_hw_1.entity.PostEntity
 import ru.netology.kotlin_for_android_hw_1.media.AttachmentType
 import ru.netology.kotlin_for_android_hw_1.media.MediaUploadResponse
 import ru.netology.kotlin_for_android_hw_1.model.FeedModel
-import ru.netology.kotlin_for_android_hw_1.retrofit.PostsRetrofitSuspend
-import ru.netology.kotlin_for_android_hw_1.roomdb.RoomDBSuspend
-import java.io.File
+import ru.netology.kotlin_for_android_hw_1.retrofit.PostsRetrofitSuspendInterface
 
-class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
+import java.io.File
+import javax.inject.Inject
+import javax.inject.Singleton
+
+@Singleton
+class PostRepositoryInServerAndSQL @Inject constructor(
+    private val dao : PostDaoSuspend,
+    private val postsRetrofitSuspendInterface : PostsRetrofitSuspendInterface,
+) : PostRepositorySuspend {
 
 
     private val servStat = MutableLiveData(FeedModel())
-    private val db = Room.databaseBuilder(context, RoomDBSuspend::class.java, "database.db").build()
-    private val dao = db.getPostDao()
+//    private val db = Room.databaseBuilder(context, RoomDBSuspend::class.java, "database.db").build()
+//    private val dao = db.getPostDao()
     private val dataFlow = dao.getPostsAll().map { it -> it.map { it.toPostFromEntity() } }
     private val dataLive: LiveData<List<Post>> = dataFlow.asLiveData(Dispatchers.Default)
     private val newerCountLive = dataLive.switchMap {
@@ -63,7 +67,8 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
         }
 
         try {
-            val response = PostsRetrofitSuspend.retrofitService.getAll()
+//            val response = PostsRetrofitSuspend.retrofitService.getAll()
+            val response = postsRetrofitSuspendInterface.getAll()
             val posts = retrofitErrorHandler(response) ?: return
 
             dao.deleteAndInsert(posts.map { PostEntity.fromPostToEntity(it) })
@@ -81,7 +86,7 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
     override suspend fun removeByID(id: Long) {
         dao.removeByID(id)
         try {
-            PostsRetrofitSuspend.retrofitService.removeById(id)
+            postsRetrofitSuspendInterface.removeById(id)
         } catch (e: Exception) {
             servStat.postValue(serverStatus(ServerStatus.ERROR))
             println("removeByID(id: Long)->PostsRetrofitSuspend.retrofitService.removeById(id) ERROR: $e")
@@ -108,7 +113,7 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
         dao.edit(PostEntity.fromPostToEntity(post))
 
         try {
-            PostsRetrofitSuspend.retrofitService.save(post)
+            postsRetrofitSuspendInterface.save(post)
         } catch (e: Exception) {
             servStat.postValue(serverStatus(ServerStatus.ERROR))
             println("edit(post: Post)->retrofitService.save(postWithAtt) ERROR: $e")
@@ -158,7 +163,7 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
         )
 
         try {
-            val serverPost = PostsRetrofitSuspend.retrofitService.save(tempPost.copy(id = 0L))
+            val serverPost = postsRetrofitSuspendInterface.save(tempPost.copy(id = 0L))
             dao.save(PostEntity.fromPostToEntity(serverPost))
             dao.removeByID(tempId)
         } catch (e: Exception) {
@@ -172,8 +177,8 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
         val post = dao.getPostById(id).toPostFromEntity()
 
         try {
-            if (post.likedByMe) PostsRetrofitSuspend.retrofitService.likeById(id)
-            else PostsRetrofitSuspend.retrofitService.dislikeById(id)
+            if (post.likedByMe) postsRetrofitSuspendInterface.likeById(id)
+            else postsRetrofitSuspendInterface.dislikeById(id)
         } catch (e: Exception) {
             dao.likeByID(id)
             servStat.postValue(serverStatus(ServerStatus.ERROR))
@@ -186,7 +191,7 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
         flagLoad = true
 
         try {
-            val response = PostsRetrofitSuspend.retrofitService.getPostsNewer(
+            val response = postsRetrofitSuspendInterface.getPostsNewer(
                 dao.getMaxId() ?: 0L
             )
             if (response.isSuccessful) {
@@ -212,7 +217,7 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
     private fun getPostsNewer(): Flow<Int> = flow {
         while (true) {
             delay(10_000)
-            val response = PostsRetrofitSuspend.retrofitService.getPostsNewer(dao.getMaxId() ?: 0L)
+            val response = postsRetrofitSuspendInterface.getPostsNewer(dao.getMaxId() ?: 0L)
             if (response.isSuccessful) {
                 servStat.postValue(serverStatus(ServerStatus.OK))
                 val posts = response.body()
@@ -240,7 +245,7 @@ class PostRepositoryInServerAndSQL(context: Context) : PostRepositorySuspend {
                 "file", file.name, file.asRequestBody()
             )
 
-            val response = PostsRetrofitSuspend.retrofitService.upload(media)
+            val response = postsRetrofitSuspendInterface.upload(media)
             if (!response.isSuccessful) {
                 println("upload->response.isSuccessful ERROR: if-else")
                 return null

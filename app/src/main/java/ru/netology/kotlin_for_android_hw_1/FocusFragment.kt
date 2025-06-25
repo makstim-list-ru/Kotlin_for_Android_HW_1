@@ -9,16 +9,20 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import ru.netology.kotlin_for_android_hw_1.apputils.NetologyUtilities.getFormatedNumber
 import ru.netology.kotlin_for_android_hw_1.databinding.FragmentFocusBinding
 import ru.netology.kotlin_for_android_hw_1.dto.Post
 import ru.netology.kotlin_for_android_hw_1.viewmodel.PostViewModel
 
+@AndroidEntryPoint
 class FocusFragment : Fragment() {
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -27,7 +31,7 @@ class FocusFragment : Fragment() {
 
         val binding = FragmentFocusBinding.inflate(inflater, container, false)
 
-        val viewModel by viewModels<PostViewModel>(ownerProducer = ::requireParentFragment)
+        val viewModel by activityViewModels<PostViewModel>()
 
         val postID = arguments?.getString("TEXT_TRANSFER")?.toLong() ?: return binding.root
         var posts = viewModel.data.value ?: return binding.root

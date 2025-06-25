@@ -14,16 +14,20 @@ import androidx.core.net.toUri
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.github.dhaval2404.imagepicker.ImagePicker
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import ru.netology.kotlin_for_android_hw_1.databinding.FragmentEditorBinding
 import ru.netology.kotlin_for_android_hw_1.viewmodel.PostViewModel
 import java.io.File
 
+@AndroidEntryPoint
 class EditorFragment : Fragment() {
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -31,7 +35,7 @@ class EditorFragment : Fragment() {
     ): View {
 
         val binding = FragmentEditorBinding.inflate(inflater, container, false)
-        val viewModel by viewModels<PostViewModel>(ownerProducer = ::requireParentFragment)
+        val viewModel by activityViewModels<PostViewModel>()
 
         val postID = arguments?.getString("TEXT_TRANSFER")?.toLong()
         val post = postID?.let { viewModel.data.value?.filter { it.id == postID }?.get(0) }

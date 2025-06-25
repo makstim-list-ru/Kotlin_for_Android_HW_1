@@ -8,9 +8,11 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.kotlin_for_android_hw_1.databinding.FragmentAuthBinding
 import ru.netology.kotlin_for_android_hw_1.viewmodel.LoginViewModel
 
+@AndroidEntryPoint
 class AuthFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,

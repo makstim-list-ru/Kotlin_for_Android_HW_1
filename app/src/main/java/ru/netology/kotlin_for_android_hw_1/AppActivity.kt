@@ -6,8 +6,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.kotlin_for_android_hw_1.databinding.ActivityAppBinding
 
+@AndroidEntryPoint
 class AppActivity : AppCompatActivity() {
 
 

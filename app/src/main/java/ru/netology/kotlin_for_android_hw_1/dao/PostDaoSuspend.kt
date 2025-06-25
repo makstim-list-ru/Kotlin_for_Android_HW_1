@@ -6,7 +6,6 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import kotlinx.coroutines.flow.Flow
-import ru.netology.kotlin_for_android_hw_1.entity.AttachmentEntity
 import ru.netology.kotlin_for_android_hw_1.entity.PostEntity
 import ru.netology.kotlin_for_android_hw_1.media.AttachmentType
 
