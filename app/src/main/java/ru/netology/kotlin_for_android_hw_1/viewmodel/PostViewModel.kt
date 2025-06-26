@@ -5,12 +5,16 @@ import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import androidx.paging.map
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import ru.netology.kotlin_for_android_hw_1.auth.AppAuthorization
@@ -36,7 +40,7 @@ class PostViewModel @Inject constructor(
 //    private val repository = PostRepositoryInServer(application)
 //    private val repository = PostRepositoryInServerWithRetrofit(application)
 
-//    private val repository: PostRepositorySuspend = PostRepositoryInServerAndSQL(application)
+    //    private val repository: PostRepositorySuspend = PostRepositoryInServerAndSQL(application)
     private val _photoLive = MutableLiveData<PhotoModel?>(null)
 
     val photoLive: LiveData<PhotoModel?>
@@ -46,12 +50,16 @@ class PostViewModel @Inject constructor(
     val newerCount: LiveData<Int> = repository.getNewerCount()
 
     //    val data: LiveData<List<Post>> = repository.getData()
-    val data: LiveData<List<Post>> = AppAuthorization.getInstance()
+    private val cached: Flow<PagingData<Post>> = repository.getDataFlow().cachedIn(viewModelScope)
+    val data: Flow<PagingData<Post>> = AppAuthorization.getInstance()
         .authStateFlow
         .flatMapLatest { (myId, _) ->
-            repository.getDataFlow()
-                .map { posts -> posts.map { it.copy(ownedByMe = it.authorId == myId) } }
-        }.asLiveData(Dispatchers.Default)
+            cached.map { pagingData ->
+                pagingData.map { post ->
+                    post.copy(ownedByMe = post.authorId == myId)
+                }
+            }
+        }.flowOn(Dispatchers.Default)
 
 
     init {

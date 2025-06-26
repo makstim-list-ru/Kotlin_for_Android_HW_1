@@ -16,7 +16,8 @@ import javax.inject.Singleton
 class PostRetrofitModule {
 
     companion object {
-        private const val BASE_URL = "http://10.0.2.2:9999/api/slow/"
+        private const val BASE_URL = "http://10.0.2.2:9999/api/"
+        //private const val BASE_URL = "http://10.0.2.2:9999/api/slow/"
     }
 
     @Provides

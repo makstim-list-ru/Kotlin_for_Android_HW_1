@@ -4,6 +4,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.switchMap
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.PagingSource
+import androidx.paging.map
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -23,23 +29,31 @@ import ru.netology.kotlin_for_android_hw_1.media.AttachmentType
 import ru.netology.kotlin_for_android_hw_1.media.MediaUploadResponse
 import ru.netology.kotlin_for_android_hw_1.model.FeedModel
 import ru.netology.kotlin_for_android_hw_1.retrofit.PostsRetrofitSuspendInterface
-
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class PostRepositoryInServerAndSQL @Inject constructor(
-    private val dao : PostDaoSuspend,
-    private val postsRetrofitSuspendInterface : PostsRetrofitSuspendInterface,
+    private val dao: PostDaoSuspend,
+    private val postsRetrofitSuspendInterface: PostsRetrofitSuspendInterface,
 ) : PostRepositorySuspend {
 
 
     private val servStat = MutableLiveData(FeedModel())
-//    private val db = Room.databaseBuilder(context, RoomDBSuspend::class.java, "database.db").build()
-//    private val dao = db.getPostDao()
-    private val dataFlow = dao.getPostsAll().map { it -> it.map { it.toPostFromEntity() } }
-    private val dataLive: LiveData<List<Post>> = dataFlow.asLiveData(Dispatchers.Default)
+
+    //    private val db = Room.databaseBuilder(context, RoomDBSuspend::class.java, "database.db").build()
+    //    private val dao = db.getPostDao()
+
+    @OptIn(ExperimentalPagingApi::class)
+    private val dataFlow: Flow<PagingData<Post>> = Pager(
+        config = PagingConfig(pageSize = 5, enablePlaceholders = false),
+        remoteMediator = PostRemoteMediator(dao, postsRetrofitSuspendInterface),
+        pagingSourceFactory = { dao.getPagingSource() },
+    ).flow.map { pagingData -> pagingData.map { postEntity -> postEntity.toPostFromEntity() } }
+
+    //    private val dataFlow = dao.getPostsAll().map { it -> it.map { it.toPostFromEntity() } }
+    private val dataLive: LiveData<PagingData<Post>> = dataFlow.asLiveData(Dispatchers.Default)
     private val newerCountLive = dataLive.switchMap {
         getPostsNewer().asLiveData(Dispatchers.Default)
     }
@@ -49,10 +63,10 @@ class PostRepositoryInServerAndSQL @Inject constructor(
     private var flagLoad = false
 
     override fun getServStat(): LiveData<FeedModel> = servStat
-    override fun getData(): LiveData<List<Post>> = dataLive
+    override fun getData(): LiveData<PagingData<Post>> = dataLive
     override fun getNewerCount() = newerCountLive
 
-    override fun getDataFlow(): Flow<List<Post>> = dataFlow
+    override fun getDataFlow(): Flow<PagingData<Post>> = dataFlow
 
 
     override suspend fun getPostsAllAsync() {
@@ -257,8 +271,6 @@ class PostRepositoryInServerAndSQL @Inject constructor(
             return null
         }
     }
-
-
 
 
     private fun <T> retrofitErrorHandler(res: Response<T>): T? {

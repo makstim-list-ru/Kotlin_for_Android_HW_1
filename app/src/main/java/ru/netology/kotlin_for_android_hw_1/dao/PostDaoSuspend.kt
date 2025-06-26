@@ -1,5 +1,6 @@
 package ru.netology.kotlin_for_android_hw_1.dao
 
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -14,6 +15,9 @@ interface PostDaoSuspend {
     //@Query("SELECT * FROM PostEntity ORDER BY id ASC")
     @Query("SELECT * FROM PostEntity ORDER BY CASE WHEN id >= 0 THEN 0 ELSE 1 END ASC, ABS(id) ASC")
     fun getPostsAll(): Flow<List<PostEntity>>
+
+    @Query("SELECT * FROM PostEntity ORDER BY CASE WHEN id >= 0 THEN 0 ELSE 1 END ASC, ABS(id) ASC")
+    fun getPagingSource(): PagingSource<Int, PostEntity>
 
     @Query("SELECT * FROM PostEntity WHERE id = :id")
     suspend fun getPostById(id: Long): PostEntity

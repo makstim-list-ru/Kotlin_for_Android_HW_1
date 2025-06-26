@@ -15,13 +15,17 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import ru.netology.kotlin_for_android_hw_1.adapter.PostsAdapter
 import ru.netology.kotlin_for_android_hw_1.auth.AppAuthorization
 import ru.netology.kotlin_for_android_hw_1.databinding.FragmentMainBinding
@@ -71,17 +75,23 @@ class MainFragment : Fragment() {
         }
         binding.container.adapter = adapter
 
-        viewModel.data.observe(viewLifecycleOwner) { posts ->
-            binding.emptyText.isVisible = posts.isNullOrEmpty()
-            val newPostFlag = adapter.currentList.size < posts.size
-            adapter.submitList(posts) {
-                if (newPostFlag) {
-                    var position = adapter.currentList.size
-                    if (position > 1) position--
-                    binding.container.scrollToPosition(position)
-                }
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.data.collectLatest { adapter.submitData(it) }
             }
         }
+
+//        viewModel.data.observe(viewLifecycleOwner) { posts ->
+//            binding.emptyText.isVisible = posts.isNullOrEmpty()
+//            val newPostFlag = adapter.currentList.size < posts.size
+//            adapter.submitList(posts) {
+//                if (newPostFlag) {
+//                    var position = adapter.currentList.size
+//                    if (position > 1) position--
+//                    binding.container.scrollToPosition(position)
+//                }
+//            }
+//        }
 
         viewModel.dataServerStatus.observe(viewLifecycleOwner) { state ->
             binding.progress.isVisible = state.loading

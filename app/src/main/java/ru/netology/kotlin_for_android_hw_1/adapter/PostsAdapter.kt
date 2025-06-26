@@ -4,8 +4,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import ru.netology.kotlin_for_android_hw_1.R
@@ -16,7 +16,7 @@ import kotlin.math.ln
 import kotlin.math.pow
 
 class PostsAdapter(private val callback: (Post, String) -> Unit) :
-    ListAdapter<Post, PostViewHolder>(PostDiffUtil) {
+    PagingDataAdapter<Post, PostViewHolder>(PostDiffUtil) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
         val binding = PostCardBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return PostViewHolder(binding, callback)
@@ -24,7 +24,7 @@ class PostsAdapter(private val callback: (Post, String) -> Unit) :
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
 
-        val post = getItem(position)
+        val post = getItem(position) ?: return
         holder.onBindPost(post)
     }
 }

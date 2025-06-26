@@ -38,8 +38,8 @@ class EditorFragment : Fragment() {
         val viewModel by activityViewModels<PostViewModel>()
 
         val postID = arguments?.getString("TEXT_TRANSFER")?.toLong()
-        val post = postID?.let { viewModel.data.value?.filter { it.id == postID }?.get(0) }
-        val urlPost = post?.let { "http://10.0.2.2:9999/media/${post.attachment?.url}" }
+        val post = null //TODO postID?.let { viewModel.data.asLiveData(Dispatchers.Default).value?.filter { it.id == postID }?.get(0) }
+        val urlPost = "" //TODO post?.let { "http://10.0.2.2:9999/media/${post.attachment?.url}" }
         val photoIntentLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { activityResult ->
                 if (activityResult.resultCode == ImagePicker.RESULT_ERROR) {
@@ -51,13 +51,12 @@ class EditorFragment : Fragment() {
             }
 
 
-        binding.content2.setText(post?.content)
+        //TODO binding.content2.setText(post?.content)
 
         urlPost?.let {
             viewModel.changePhotoVM(
                 urlPost.toUri(),
                 urlPost.toUri().path?.let { File(it) },
-//                urlPost.toUri().toFile()
             )
         }
 

@@ -34,8 +34,8 @@ class FocusFragment : Fragment() {
         val viewModel by activityViewModels<PostViewModel>()
 
         val postID = arguments?.getString("TEXT_TRANSFER")?.toLong() ?: return binding.root
-        var posts = viewModel.data.value ?: return binding.root
-        var post = posts.filter { it.id == postID }[0]
+        var posts = null//TODO viewModel.data.value ?: return binding.root
+        var post = Post()//TODO posts.filter { it.id == postID }[0]
 
 //        onBindPost(post, binding)
 
@@ -108,15 +108,16 @@ class FocusFragment : Fragment() {
 
         }
 
-        viewModel.data.observe(viewLifecycleOwner) {
-            posts = viewModel.data.value ?: return@observe
-            posts.filter { it.id == postID }.let {
-                if (it.isNotEmpty()) {
-                    post = it[0]
-                    onBindPost(post, binding)
-                }
-            }
-        }
+        //TODO
+//        viewModel.data.observe(viewLifecycleOwner) {
+//            posts = viewModel.data.value ?: return@observe
+//            posts.filter { it.id == postID }.let {
+//                if (it.isNotEmpty()) {
+//                    post = it[0]
+//                    onBindPost(post, binding)
+//                }
+//            }
+//        }
 
         return binding.root
     }

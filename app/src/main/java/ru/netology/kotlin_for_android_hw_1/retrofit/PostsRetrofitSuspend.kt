@@ -11,6 +11,7 @@ import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.Path
+import retrofit2.http.Query
 import ru.netology.kotlin_for_android_hw_1.auth.AuthUploadResponse
 import ru.netology.kotlin_for_android_hw_1.dto.Post
 import ru.netology.kotlin_for_android_hw_1.media.MediaUploadResponse
@@ -19,8 +20,17 @@ interface PostsRetrofitSuspendInterface {
     @GET("posts")
     suspend fun getAll(): Response<List<Post>>
 
+    @GET("posts/latest")
+    suspend fun getLatest(@Query("count") count :Int): Response<List<Post>>
+
     @GET("posts/{id}")
     suspend fun getById(@Path("id") id: Long): Post
+
+    @GET("posts/{id}/before")
+    suspend fun getBefore(@Path("id") id: Long, @Query("count") count :Int): Response<List<Post>>
+
+    @GET("posts/{id}/after")
+    suspend fun getAfter(@Path("id") id: Long, @Query("count") count :Int): Response<List<Post>>
 
     @POST("posts")
     suspend fun save(@Body post: Post): Post
