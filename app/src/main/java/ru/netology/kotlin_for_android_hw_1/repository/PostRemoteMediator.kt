@@ -16,7 +16,10 @@ class PostRemoteMediator(
     private val postsRetrofitSuspendInterface: PostsRetrofitSuspendInterface
 ) : RemoteMediator<Int, PostEntity>() {
 
-    override suspend fun load(loadType: LoadType, state: PagingState<Int, PostEntity>): MediatorResult {
+    override suspend fun load(
+        loadType: LoadType,
+        state: PagingState<Int, PostEntity>
+    ): MediatorResult {
         try {
             val response = when (loadType) {
 
@@ -52,6 +55,7 @@ class PostRemoteMediator(
 
             return MediatorResult.Success(postList.isEmpty())
         } catch (e: IOException) {
+
             return MediatorResult.Error(e)
         }
     }

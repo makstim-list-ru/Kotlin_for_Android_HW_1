@@ -20,6 +20,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collectLatest
@@ -63,17 +64,37 @@ class MainFragment : Fragment() {
             }
             if (key == "remove") viewModel.removeVM(post.id)
             if (key == "edit") {
-                findNavController().navigate(R.id.action_mainFragment_to_editorFragment,
+                findNavController().navigate(
+                    R.id.action_mainFragment_to_editorFragment,
                     Bundle().apply { this.putString("TEXT_TRANSFER", post.id.toString()) })
                 viewModel.editVM(post)
             }
             if (key == "cancel") viewModel.cancelEditVM()
             if (key == "post") {
-                findNavController().navigate(R.id.action_mainFragment_to_focusFragment,
+                findNavController().navigate(
+                    R.id.action_mainFragment_to_focusFragment,
                     Bundle().apply { this.putString("TEXT_TRANSFER", post.id.toString()) })
             }
         }
         binding.container.adapter = adapter
+
+        adapter.addLoadStateListener {
+            // show a retry button outside the list when refresh hits an error
+            binding.retryButton.isVisible = it.refresh is LoadState.Error
+            if (it.refresh is LoadState.Error) {
+                Toast.makeText(
+                    context,
+                    "Network ERROR, check and retry",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+
+            // swipeRefreshLayout displays whether refresh is occurring
+                binding.swipeRefresh.isRefreshing = it.refresh is LoadState.Loading
+
+            // show an empty state over the list when loading initially, before items are loaded
+            //emptyState.isVisible = it.refresh is LoadState.Loading &amp;&amp; adapter.itemCount == 0
+        }
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -92,6 +113,7 @@ class MainFragment : Fragment() {
 //                }
 //            }
 //        }
+
 
         viewModel.dataServerStatus.observe(viewLifecycleOwner) { state ->
 //TODO            binding.progress.isVisible = state.loading
@@ -113,15 +135,19 @@ class MainFragment : Fragment() {
         binding.plusButton.setOnClickListener {
             findNavController().navigate(R.id.action_mainFragment_to_editorFragment)
         }
-//TODO
-//        binding.retryButton.setOnClickListener {
-//            println("Button <retry> pressed")
+
+        binding.retryButton.setOnClickListener {
+            println("INFO Button <retry> pressed")
+            adapter.retry()
 //            viewModel.loadAllPostsVM()
-//        }
-//TODO
-//        binding.swipeRefresh.setOnRefreshListener {
-//            viewModel.loadAllPostsVM()
-//        }
+        }
+
+        binding.swipeRefresh.setOnRefreshListener {
+            println("INFO SwipeRefresh event happens")
+            adapter.refresh()
+//          viewModel.loadAllPostsVM()
+        }
+
 //TODO
 //        binding.newerPostsButton.setOnClickListener {
 //            binding.newerPostsButton.isVisible = false
@@ -140,6 +166,7 @@ class MainFragment : Fragment() {
                 authViewModel.data.flowWithLifecycle(lifecycle).onEach {
                     menu.setGroupVisible(R.id.unauthenticated, !authViewModel.authenticated)
                     menu.setGroupVisible(R.id.authenticated, authViewModel.authenticated)
+                    adapter.refresh()
                 }
                     .launchIn(lifecycleScope)
             }
