@@ -8,7 +8,6 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import androidx.paging.PagingSource
 import androidx.paging.map
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -49,7 +48,7 @@ class PostRepositoryInServerAndSQL @Inject constructor(
     private val dataFlow: Flow<PagingData<Post>> = Pager(
         config = PagingConfig(pageSize = 5, enablePlaceholders = false),
         remoteMediator = PostRemoteMediator(dao, postsRetrofitSuspendInterface),
-        pagingSourceFactory = { dao.getPagingSource() },
+        pagingSourceFactory = { dao.pagingSource() },
     ).flow.map { pagingData -> pagingData.map { postEntity -> postEntity.toPostFromEntity() } }
 
     //    private val dataFlow = dao.getPostsAll().map { it -> it.map { it.toPostFromEntity() } }

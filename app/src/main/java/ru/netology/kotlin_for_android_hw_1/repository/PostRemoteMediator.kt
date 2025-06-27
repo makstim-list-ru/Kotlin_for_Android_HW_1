@@ -18,28 +18,39 @@ class PostRemoteMediator(
 
     override suspend fun load(loadType: LoadType, state: PagingState<Int, PostEntity>): MediatorResult {
         try {
-            val result = when (loadType) {
+            val response = when (loadType) {
 
                 LoadType.APPEND -> {
                     val id = state.lastItemOrNull()?.id ?: return MediatorResult.Success(false)
-                    postsRetrofitSuspendInterface.getBefore(id, state.config.pageSize)
+                    postsRetrofitSuspendInterface.getBefore(
+                        id,
+                        state.config.pageSize
+                    )
                 }
 
                 LoadType.PREPEND -> {
-                    val id = state.lastItemOrNull()?.id ?: return MediatorResult.Success(false)
-                    postsRetrofitSuspendInterface.getAfter(id, state.config.pageSize)
+                    val id = state.firstItemOrNull()?.id ?: return MediatorResult.Success(false)
+                    postsRetrofitSuspendInterface.getAfter(
+                        id,
+                        state.config.pageSize
+                    )
                 }
 
-                LoadType.REFRESH -> postsRetrofitSuspendInterface.getLatest(state.config.pageSize)
+                LoadType.REFRESH -> {
+                    //return MediatorResult.Success(false)
+                    postsRetrofitSuspendInterface.getLatest(
+                        state.config.pageSize
+                    )
+                }
             }
-            if (!result.isSuccessful) {
-                throw HttpException(result)
+            if (!response.isSuccessful) {
+                throw HttpException(response)
             }
-            val post = result.body().orEmpty()
+            val postList = response.body().orEmpty()
 
-            dao.insert(post.map { PostEntity.fromPostToEntity(it) })
+            dao.insert(postList.map { PostEntity.fromPostToEntity(it) })
 
-            return MediatorResult.Success(post.isEmpty())
+            return MediatorResult.Success(postList.isEmpty())
         } catch (e: IOException) {
             return MediatorResult.Error(e)
         }

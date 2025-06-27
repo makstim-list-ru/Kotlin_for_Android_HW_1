@@ -16,8 +16,8 @@ interface PostDaoSuspend {
     @Query("SELECT * FROM PostEntity ORDER BY CASE WHEN id >= 0 THEN 0 ELSE 1 END ASC, ABS(id) ASC")
     fun getPostsAll(): Flow<List<PostEntity>>
 
-    @Query("SELECT * FROM PostEntity ORDER BY CASE WHEN id >= 0 THEN 0 ELSE 1 END ASC, ABS(id) ASC")
-    fun getPagingSource(): PagingSource<Int, PostEntity>
+    @Query("SELECT * FROM PostEntity ORDER BY id DESC")
+    fun pagingSource(): PagingSource<Int, PostEntity>
 
     @Query("SELECT * FROM PostEntity WHERE id = :id")
     suspend fun getPostById(id: Long): PostEntity
@@ -90,5 +90,4 @@ interface PostDaoSuspend {
 
     @Query("SELECT * FROM PostEntity WHERE id < 0 ORDER BY id ASC")
     suspend fun getUnsaved(): List<PostEntity>
-
 }

@@ -61,12 +61,12 @@ class PostViewModel @Inject constructor(
             }
         }.flowOn(Dispatchers.Default)
 
-
-    init {
-        viewModelScope.launch {
-            repository.getPostsAllAsync()
-        }
-    }
+//TODO
+//    init {
+//        viewModelScope.launch {
+//            repository.getPostsAllAsync()
+//        }
+//    }
 
     private val editedPostTmp = MutableLiveData(postEmpty)
 

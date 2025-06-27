@@ -22,6 +22,7 @@ lifecycleLivedataKtx = "2.9.1"
 googleGmsGoogleServices = "4.4.2"
 firebaseMessaging = "24.1.2"
 pagingRuntimeKtx = "3.3.6"
+roomPaging = "2.7.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -49,6 +50,7 @@ androidx-swiperefreshlayout = { group = "androidx.swiperefreshlayout", name = "s
 androidx-lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycleLivedataKtx" }
 firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging", version.ref = "firebaseMessaging" }
 androidx-paging-runtime-ktx = { group = "androidx.paging", name = "paging-runtime-ktx", version.ref = "pagingRuntimeKtx" }
+androidx-room-paging = { group = "androidx.room", name = "room-paging", version.ref = "roomPaging" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

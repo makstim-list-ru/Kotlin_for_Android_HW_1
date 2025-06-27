@@ -94,39 +94,39 @@ class MainFragment : Fragment() {
 //        }
 
         viewModel.dataServerStatus.observe(viewLifecycleOwner) { state ->
-            binding.progress.isVisible = state.loading
+//TODO            binding.progress.isVisible = state.loading
             binding.errorGroup.isVisible = state.error
             binding.emptyText.isVisible = state.empty
-            binding.swipeRefresh.isRefreshing = state.refreshing
+//TODO            binding.swipeRefresh.isRefreshing = state.refreshing
             if (state.error) Toast.makeText(
                 activity,
                 "Error IO with the Server, please, try again!",
                 Toast.LENGTH_LONG
             ).show()
         }
-
-        viewModel.newerCount.observe(viewLifecycleOwner) {
-            println(it)
-            binding.newerPostsButton.isVisible = it > 0
-        }
+//TODO
+//        viewModel.newerCount.observe(viewLifecycleOwner) {
+//            println(it)
+//            binding.newerPostsButton.isVisible = it > 0
+//        }
 
         binding.plusButton.setOnClickListener {
             findNavController().navigate(R.id.action_mainFragment_to_editorFragment)
         }
-
-        binding.retryButton.setOnClickListener {
-            println("Button <retry> pressed")
-            viewModel.loadAllPostsVM()
-        }
-
-        binding.swipeRefresh.setOnRefreshListener {
-            viewModel.loadAllPostsVM()
-        }
-
-        binding.newerPostsButton.setOnClickListener {
-            binding.newerPostsButton.isVisible = false
-            viewModel.loadNewerVM()
-        }
+//TODO
+//        binding.retryButton.setOnClickListener {
+//            println("Button <retry> pressed")
+//            viewModel.loadAllPostsVM()
+//        }
+//TODO
+//        binding.swipeRefresh.setOnRefreshListener {
+//            viewModel.loadAllPostsVM()
+//        }
+//TODO
+//        binding.newerPostsButton.setOnClickListener {
+//            binding.newerPostsButton.isVisible = false
+//            viewModel.loadNewerVM()
+//        }
 
 
         binding.toolbarAuth.addMenuProvider(object : MenuProvider {

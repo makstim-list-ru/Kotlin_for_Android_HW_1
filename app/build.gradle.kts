@@ -62,6 +62,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.firebase.messaging)
     implementation(libs.androidx.paging.runtime.ktx)
+    implementation(libs.androidx.room.paging)
     kapt(libs.androidx.room.compiler.v272)
 
     //kapt("androidx.room:room-compiler:2.7.2")
