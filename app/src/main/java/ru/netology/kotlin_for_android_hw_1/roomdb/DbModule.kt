@@ -8,6 +8,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import ru.netology.kotlin_for_android_hw_1.dao.PostDaoSuspend
+import ru.netology.kotlin_for_android_hw_1.dao.PostRemoteKeyDao
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -24,4 +25,7 @@ class DbModule {
 
     @Provides
     fun providePostDao(roomDBSuspend: RoomDBSuspend) : PostDaoSuspend = roomDBSuspend.getPostDao()
+
+    @Provides
+    fun provideRemoteKeyDao(roomDBSuspend: RoomDBSuspend) : PostRemoteKeyDao = roomDBSuspend.getPostRemoteKeyDao()
 }

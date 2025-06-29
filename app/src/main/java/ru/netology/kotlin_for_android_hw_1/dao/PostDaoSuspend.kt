@@ -19,6 +19,9 @@ interface PostDaoSuspend {
     @Query("SELECT * FROM PostEntity ORDER BY id DESC")
     fun pagingSource(): PagingSource<Int, PostEntity>
 
+    @Query("SELECT COUNT(*) == 0 FROM PostEntity")
+    suspend fun isEmpty(): Boolean
+
     @Query("SELECT * FROM PostEntity WHERE id = :id")
     suspend fun getPostById(id: Long): PostEntity
 
@@ -52,6 +55,9 @@ interface PostDaoSuspend {
 
     @Query("DELETE FROM PostEntity WHERE id > 0")
     suspend fun removeAll()
+
+    @Query("DELETE FROM PostEntity")
+    suspend fun removeAllComplete()
 
     suspend fun save(post: PostEntity) {
         insert(post)

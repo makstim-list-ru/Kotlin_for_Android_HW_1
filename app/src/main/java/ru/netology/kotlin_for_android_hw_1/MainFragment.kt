@@ -90,7 +90,7 @@ class MainFragment : Fragment() {
             }
 
             // swipeRefreshLayout displays whether refresh is occurring
-                binding.swipeRefresh.isRefreshing = it.refresh is LoadState.Loading
+            binding.swipeRefresh.isRefreshing = it.refresh is LoadState.Loading
 
             // show an empty state over the list when loading initially, before items are loaded
             //emptyState.isVisible = it.refresh is LoadState.Loading &amp;&amp; adapter.itemCount == 0

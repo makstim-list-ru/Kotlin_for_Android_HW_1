@@ -21,6 +21,7 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.Response
 import ru.netology.kotlin_for_android_hw_1.dao.PostDaoSuspend
+import ru.netology.kotlin_for_android_hw_1.dao.PostRemoteKeyDao
 import ru.netology.kotlin_for_android_hw_1.dto.Attachment
 import ru.netology.kotlin_for_android_hw_1.dto.Post
 import ru.netology.kotlin_for_android_hw_1.entity.PostEntity
@@ -28,14 +29,17 @@ import ru.netology.kotlin_for_android_hw_1.media.AttachmentType
 import ru.netology.kotlin_for_android_hw_1.media.MediaUploadResponse
 import ru.netology.kotlin_for_android_hw_1.model.FeedModel
 import ru.netology.kotlin_for_android_hw_1.retrofit.PostsRetrofitSuspendInterface
+import ru.netology.kotlin_for_android_hw_1.roomdb.RoomDBSuspend
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class PostRepositoryInServerAndSQL @Inject constructor(
+    private val db: RoomDBSuspend,
     private val dao: PostDaoSuspend,
     private val postsRetrofitSuspendInterface: PostsRetrofitSuspendInterface,
+    private val postRemoteKeyDao: PostRemoteKeyDao,
 ) : PostRepositorySuspend {
 
 
@@ -46,8 +50,13 @@ class PostRepositoryInServerAndSQL @Inject constructor(
 
     @OptIn(ExperimentalPagingApi::class)
     private val dataFlow: Flow<PagingData<Post>> = Pager(
-        config = PagingConfig(pageSize = 5, enablePlaceholders = false),
-        remoteMediator = PostRemoteMediator(dao, postsRetrofitSuspendInterface),
+        config = PagingConfig(pageSize = 10, enablePlaceholders = true),
+        remoteMediator = PostRemoteMediator(
+            db,
+            dao,
+            postsRetrofitSuspendInterface,
+            postRemoteKeyDao
+        ),
         pagingSourceFactory = { dao.pagingSource() },
     ).flow.map { pagingData -> pagingData.map { postEntity -> postEntity.toPostFromEntity() } }
 
