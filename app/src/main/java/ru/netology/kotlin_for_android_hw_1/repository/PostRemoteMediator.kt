@@ -30,32 +30,27 @@ class PostRemoteMediator(
 
                 LoadType.APPEND -> {
                     val id = postRemoteKeyDao.min() ?: return MediatorResult.Success(false)
-                    postsRetrofitSuspendInterface.getBefore(
-                        id,
-                        state.config.pageSize
-                    )
+                    postsRetrofitSuspendInterface.getBefore(id, state.config.pageSize)
                 }
 
                 LoadType.PREPEND -> {
-                    return MediatorResult.Success(true)
-//                    val id = postRemoteKeyDao.max() ?: return MediatorResult.Success(true)
-//                    postsRetrofitSuspendInterface.getAfter(
-//                        id,
-//                        state.config.pageSize
-//                    )
+//                    return MediatorResult.Success(true)
+                    val id = postRemoteKeyDao.max() ?: return MediatorResult.Success(false)
+                    postsRetrofitSuspendInterface.getAfter(id, state.config.pageSize)
                 }
 
                 LoadType.REFRESH -> {
                     //return MediatorResult.Success(false)
-                    if (dao.isEmpty()) postsRetrofitSuspendInterface.getLatest(
-                        state.config.initialLoadSize
-                    ) else {
-                        val id = postRemoteKeyDao.max() ?: return MediatorResult.Success(true)
-                        postsRetrofitSuspendInterface.getAfter(
-                            id,
-                            state.config.pageSize
-                        )
-                    }
+                    postsRetrofitSuspendInterface.getLatest(state.config.initialLoadSize)
+//                    if (dao.isEmpty()) postsRetrofitSuspendInterface.getLatest(
+//                        state.config.initialLoadSize
+//                    ) else {
+//                        val id = postRemoteKeyDao.max() ?: return MediatorResult.Success(true)
+//                        postsRetrofitSuspendInterface.getAfter(
+//                            id,
+//                            state.config.pageSize
+//                        )
+//                    }
                 }
             }
             if (!response.isSuccessful) {
@@ -63,10 +58,14 @@ class PostRemoteMediator(
             }
 
             if (response.body().isNullOrEmpty())
-                if (response.body() == null) println("ERR --------------- postList = response.body() == NULL")
-                else println("ERR --------------- postList = response.body() == EMPTY")
+                if (response.body() == null)
+                    println("ERR --------------- postList = response.body() == NULL")
+                else
+                    println("ERR --------------- postList = response.body() == EMPTY")
 
-            val postList = response.body() ?: response.body().orEmpty()
+            val postList = response.body().orEmpty()
+
+            if(postList.isEmpty()) return MediatorResult.Success(postList.isEmpty())
 
             db.withTransaction {
                 when (loadType) {
@@ -88,12 +87,12 @@ class PostRemoteMediator(
                     }
 
                     LoadType.PREPEND -> {
-//                        postRemoteKeyDao.insert(
-//                            PostRemoteKeyEntity(
-//                                type = PostRemoteKeyEntity.KeyType.AFTER,
-//                                id = postList.first().id,
-//                            )
-//                        )
+                        postRemoteKeyDao.insert(
+                            PostRemoteKeyEntity(
+                                type = PostRemoteKeyEntity.KeyType.AFTER,
+                                id = postList.first().id,
+                            )
+                        )
                     }
 
                     LoadType.APPEND -> {
@@ -111,7 +110,7 @@ class PostRemoteMediator(
 
             return MediatorResult.Success(postList.isEmpty())
         } catch (e: Exception) {
-
+            println("ERR --------------- MediatorResult.Error(e): $e")
             return MediatorResult.Error(e)
         }
     }

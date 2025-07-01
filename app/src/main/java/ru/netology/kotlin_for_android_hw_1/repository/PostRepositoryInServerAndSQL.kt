@@ -8,6 +8,7 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import androidx.paging.insertSeparators
 import androidx.paging.map
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -22,7 +23,9 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.Response
 import ru.netology.kotlin_for_android_hw_1.dao.PostDaoSuspend
 import ru.netology.kotlin_for_android_hw_1.dao.PostRemoteKeyDao
+import ru.netology.kotlin_for_android_hw_1.dto.Ad
 import ru.netology.kotlin_for_android_hw_1.dto.Attachment
+import ru.netology.kotlin_for_android_hw_1.dto.FeedItem
 import ru.netology.kotlin_for_android_hw_1.dto.Post
 import ru.netology.kotlin_for_android_hw_1.entity.PostEntity
 import ru.netology.kotlin_for_android_hw_1.media.AttachmentType
@@ -33,6 +36,7 @@ import ru.netology.kotlin_for_android_hw_1.roomdb.RoomDBSuspend
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.random.Random
 
 @Singleton
 class PostRepositoryInServerAndSQL @Inject constructor(
@@ -49,7 +53,7 @@ class PostRepositoryInServerAndSQL @Inject constructor(
     //    private val dao = db.getPostDao()
 
     @OptIn(ExperimentalPagingApi::class)
-    private val dataFlow: Flow<PagingData<Post>> = Pager(
+    private val dataFlow: Flow<PagingData<FeedItem>> = Pager(
         config = PagingConfig(pageSize = 10, enablePlaceholders = true),
         remoteMediator = PostRemoteMediator(
             db,
@@ -58,10 +62,19 @@ class PostRepositoryInServerAndSQL @Inject constructor(
             postRemoteKeyDao
         ),
         pagingSourceFactory = { dao.pagingSource() },
-    ).flow.map { pagingData -> pagingData.map { postEntity -> postEntity.toPostFromEntity() } }
+    ).flow.map { pagingData ->
+        pagingData.map { postEntity -> postEntity.toPostFromEntity() }
+            .insertSeparators { previous, next ->
+                if (previous?.id?.rem(5) == 0L) Ad(
+                    Random.nextLong(),
+                    "figma.jpg"
+                ) else null
+            }
+    }
+
 
     //    private val dataFlow = dao.getPostsAll().map { it -> it.map { it.toPostFromEntity() } }
-    private val dataLive: LiveData<PagingData<Post>> = dataFlow.asLiveData(Dispatchers.Default)
+    private val dataLive: LiveData<PagingData<FeedItem>> = dataFlow.asLiveData(Dispatchers.Default)
     private val newerCountLive = dataLive.switchMap {
         getPostsNewer().asLiveData(Dispatchers.Default)
     }
@@ -71,10 +84,10 @@ class PostRepositoryInServerAndSQL @Inject constructor(
     private var flagLoad = false
 
     override fun getServStat(): LiveData<FeedModel> = servStat
-    override fun getData(): LiveData<PagingData<Post>> = dataLive
+    override fun getData(): LiveData<PagingData<FeedItem>> = dataLive
     override fun getNewerCount() = newerCountLive
 
-    override fun getDataFlow(): Flow<PagingData<Post>> = dataFlow
+    override fun getDataFlow(): Flow<PagingData<FeedItem>> = dataFlow
 
 
     override suspend fun getPostsAllAsync() {

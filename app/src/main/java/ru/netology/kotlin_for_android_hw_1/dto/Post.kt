@@ -2,8 +2,17 @@ package ru.netology.kotlin_for_android_hw_1.dto
 
 import ru.netology.kotlin_for_android_hw_1.media.AttachmentType
 
+interface FeedItem {
+    val id: Long
+}
+
+data class Ad(
+    override val id: Long,
+    val image: String
+) : FeedItem
+
 data class Post(
-    val id: Long = 0,
+    override val id: Long = 0,
     val authorId: Long = 0,
     val author: String = "",
     val authorAvatar: String = "",
@@ -16,7 +25,7 @@ data class Post(
     val video: String = "",
     val attachment: Attachment? = null,
     val ownedByMe: Boolean = false,
-)
+) : FeedItem
 
 data class Attachment(
     val url: String,

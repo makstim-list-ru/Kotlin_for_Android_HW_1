@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import ru.netology.kotlin_for_android_hw_1.auth.AppAuthorization
+import ru.netology.kotlin_for_android_hw_1.dto.FeedItem
 import ru.netology.kotlin_for_android_hw_1.dto.Post
 import ru.netology.kotlin_for_android_hw_1.dto.postEmpty
 import ru.netology.kotlin_for_android_hw_1.media.PhotoModel
@@ -50,13 +51,13 @@ class PostViewModel @Inject constructor(
     val newerCount: LiveData<Int> = repository.getNewerCount()
 
     //    val data: LiveData<List<Post>> = repository.getData()
-    private val cached: Flow<PagingData<Post>> = repository.getDataFlow().cachedIn(viewModelScope)
-    val data: Flow<PagingData<Post>> = AppAuthorization.getInstance()
+    private val cached: Flow<PagingData<FeedItem>> = repository.getDataFlow().cachedIn(viewModelScope)
+    val data: Flow<PagingData<FeedItem>> = AppAuthorization.getInstance()
         .authStateFlow
         .flatMapLatest { (myId, _) ->
             cached.map { pagingData ->
                 pagingData.map { post ->
-                    post.copy(ownedByMe = post.authorId == myId)
+                    if(post is Post) post.copy(ownedByMe = post.authorId == myId) else post
                 }
             }
         }.flowOn(Dispatchers.Default)

@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import ru.netology.kotlin_for_android_hw_1.adapter.PostLoadingStateAdapter
 import ru.netology.kotlin_for_android_hw_1.adapter.PostsAdapter
 import ru.netology.kotlin_for_android_hw_1.auth.AppAuthorization
 import ru.netology.kotlin_for_android_hw_1.databinding.FragmentMainBinding
@@ -76,11 +77,14 @@ class MainFragment : Fragment() {
                     Bundle().apply { this.putString("TEXT_TRANSFER", post.id.toString()) })
             }
         }
-        binding.container.adapter = adapter
+        binding.container.adapter = adapter.withLoadStateHeaderAndFooter(
+            header = PostLoadingStateAdapter{adapter.retry()},
+            footer = PostLoadingStateAdapter{adapter.retry()}
+        )
 
         adapter.addLoadStateListener {
             // show a retry button outside the list when refresh hits an error
-            binding.retryButton.isVisible = it.refresh is LoadState.Error
+//            binding.retryButton.isVisible = it.refresh is LoadState.Error
             if (it.refresh is LoadState.Error) {
                 Toast.makeText(
                     context,
