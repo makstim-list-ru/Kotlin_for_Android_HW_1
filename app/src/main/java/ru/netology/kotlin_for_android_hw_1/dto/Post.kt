@@ -2,7 +2,7 @@ package ru.netology.kotlin_for_android_hw_1.dto
 
 import ru.netology.kotlin_for_android_hw_1.media.AttachmentType
 
-interface FeedItem {
+sealed interface FeedItem {
     val id: Long
 }
 

@@ -12,6 +12,7 @@ import ru.netology.kotlin_for_android_hw_1.entity.PostEntity
 import ru.netology.kotlin_for_android_hw_1.entity.PostRemoteKeyEntity
 import ru.netology.kotlin_for_android_hw_1.retrofit.PostsRetrofitSuspendInterface
 import ru.netology.kotlin_for_android_hw_1.roomdb.RoomDBSuspend
+import kotlin.coroutines.cancellation.CancellationException
 
 @OptIn(ExperimentalPagingApi::class)
 class PostRemoteMediator(
@@ -109,6 +110,8 @@ class PostRemoteMediator(
             }
 
             return MediatorResult.Success(postList.isEmpty())
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             println("ERR --------------- MediatorResult.Error(e): $e")
             return MediatorResult.Error(e)
