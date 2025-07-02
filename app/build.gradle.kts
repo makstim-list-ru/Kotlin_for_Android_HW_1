@@ -1,15 +1,23 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
 
     alias(libs.plugins.google.gms.google.services)
     id("com.google.dagger.hilt.android")
-    id("org.jetbrains.kotlin.kapt")
+    id("com.google.devtools.ksp")
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget = JvmTarget.fromTarget("17")
+    }
 }
 
 android {
     namespace = "ru.netology.kotlin_for_android_hw_1"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "ru.netology.kotlin_for_android_hw_1"
@@ -34,9 +42,7 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
+
     buildFeatures {
         viewBinding = true
     }
@@ -63,13 +69,10 @@ dependencies {
     implementation(libs.firebase.messaging)
     implementation(libs.androidx.paging.runtime.ktx)
     implementation(libs.androidx.room.paging)
-    kapt(libs.androidx.room.compiler.v272)
+    ksp(libs.androidx.room.compiler.v272)
 
-    //kapt("androidx.room:room-compiler:2.7.2")
-
-    implementation("com.google.dagger:hilt-android:2.56.2")
-    kapt("com.google.dagger:hilt-compiler:2.56.2")
-
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
 
     // define a BOM and its version
     implementation(platform(libs.okhttp.bom))
@@ -83,8 +86,4 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-}
-
-kapt {
-    correctErrorTypes = true
 }

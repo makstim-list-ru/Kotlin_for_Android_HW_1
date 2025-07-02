@@ -33,9 +33,14 @@ import ru.netology.kotlin_for_android_hw_1.auth.AppAuthorization
 import ru.netology.kotlin_for_android_hw_1.databinding.FragmentMainBinding
 import ru.netology.kotlin_for_android_hw_1.viewmodel.AuthViewModel
 import ru.netology.kotlin_for_android_hw_1.viewmodel.PostViewModel
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainFragment : Fragment() {
+
+    @Inject
+    lateinit var appAuthorization: AppAuthorization
+
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -185,13 +190,13 @@ class MainFragment : Fragment() {
 
                     R.id.signup -> {
                         // TODO: just hardcode it, implementation must be in homework
-                        AppAuthorization.getInstance().setAuth(5, "x-token")
+                        appAuthorization.setAuth(5, "x-token")
                         return true
                     }
 
                     R.id.signout -> {
                         // TODO: just hardcode it, implementation must be in homework
-                        AppAuthorization.getInstance().removeAuth()
+                        appAuthorization.removeAuth()
                         return true
                     }
 

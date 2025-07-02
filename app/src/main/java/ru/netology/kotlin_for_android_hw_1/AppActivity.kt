@@ -12,8 +12,6 @@ import ru.netology.kotlin_for_android_hw_1.databinding.ActivityAppBinding
 @AndroidEntryPoint
 class AppActivity : AppCompatActivity() {
 
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()

@@ -29,12 +29,13 @@ class PostRetrofitModule {
     @Provides
     @Singleton
     fun provideOkHttpClient(
-        logging: HttpLoggingInterceptor
+        logging: HttpLoggingInterceptor,
+        appAuthorization: AppAuthorization
     ): OkHttpClient = OkHttpClient.Builder()
         .addInterceptor(logging)
         .addInterceptor { chain ->
             val newRequest =
-                AppAuthorization.getInstance().authStateFlow.value.token?.let { token ->
+                appAuthorization.authStateFlow.value.token?.let { token ->
                     chain.request().newBuilder()
                         .addHeader("Authorization", token)
                         .build()

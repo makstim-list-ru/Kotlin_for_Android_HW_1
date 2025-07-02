@@ -13,7 +13,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val postsRetrofitSuspendInterface: PostsRetrofitSuspendInterface
+    private val postsRetrofitSuspendInterface: PostsRetrofitSuspendInterface,
+    private val appAuthorization: AppAuthorization
 ) : ViewModel() {
 
     val data = LoginDefault("student", "secret")
@@ -40,7 +41,7 @@ class LoginViewModel @Inject constructor(
         }
         val authUploadResponse = requireNotNull(response.body())
         println(authUploadResponse)
-        AppAuthorization.getInstance()
+        appAuthorization
             .setAuth(id = authUploadResponse.id, token = authUploadResponse.token)
         return response.body()
     }

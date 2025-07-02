@@ -2,10 +2,14 @@ package ru.netology.kotlin_for_android_hw_1.auth
 
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class AppAuthorization private constructor(context: Context) {
+@Singleton
+class AppAuthorization @Inject constructor(@ApplicationContext context: Context) {
     private val prefs = context.getSharedPreferences("auth", MODE_PRIVATE)
     private val _authStateFlow: MutableStateFlow<AuthState>
 
@@ -44,17 +48,6 @@ class AppAuthorization private constructor(context: Context) {
     companion object {
         private const val ID_KEY = "id"
         private const val TOKEN_KEY = "token"
-
-        @Volatile
-        private var instance: AppAuthorization? = null
-
-        fun getInstance(): AppAuthorization = requireNotNull(instance) {
-            "AppAuth is not initialized, you must call AppAuth.initializeApp(Context context) first."
-        }
-
-        fun init(context: Context) {
-            instance = AppAuthorization(context)
-        }
     }
 }
 

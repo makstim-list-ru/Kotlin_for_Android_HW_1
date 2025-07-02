@@ -2,9 +2,9 @@ package ru.netology.kotlin_for_android_hw_1.viewmodel
 
 import android.app.Application
 import android.net.Uri
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
@@ -30,9 +30,9 @@ import javax.inject.Inject
 @HiltViewModel
 @ExperimentalCoroutinesApi
 class PostViewModel @Inject constructor(
-    application: Application,
-    private val repository: PostRepositorySuspend
-) : AndroidViewModel(application) {
+    private val repository: PostRepositorySuspend,
+    appAuthorization: AppAuthorization
+) : ViewModel() {
 
 //    private val repository = PostRepositoryInMemory()
 //    private val repository = PostRepositoryInFile(application)
@@ -52,7 +52,7 @@ class PostViewModel @Inject constructor(
 
     //    val data: LiveData<List<Post>> = repository.getData()
     private val cached: Flow<PagingData<FeedItem>> = repository.getDataFlow().cachedIn(viewModelScope)
-    val data: Flow<PagingData<FeedItem>> = AppAuthorization.getInstance()
+    val data: Flow<PagingData<FeedItem>> = appAuthorization
         .authStateFlow
         .flatMapLatest { (myId, _) ->
             cached.map { pagingData ->
